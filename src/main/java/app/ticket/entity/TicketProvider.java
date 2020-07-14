@@ -1,6 +1,9 @@
 package app.ticket.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,17 +17,12 @@ import java.util.List;
 public class TicketProvider {
     private Integer id;
     private Provider provider;
+    private Ticket ticket;
     private String link;
-    private List<Section> sectionList;
-
-    public TicketProvider() {
-    }
-
-    public TicketProvider(Integer id) {
-        this.id = id;
-    }
+    private List<Section> sectionList = new ArrayList<>();
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     public Integer getId() {
         return id;
@@ -34,13 +32,25 @@ public class TicketProvider {
         this.id = id;
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "provider_id")
     public Provider getProvider() {
         return provider;
     }
 
     public void setProvider(Provider provider) {
         this.provider = provider;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "ticket_id", nullable = false)
+    @JsonIgnore // avoid mutual dependency
+    public Ticket getTicket() {
+        return ticket;
+    }
+
+    public void setTicket(Ticket ticket) {
+        this.ticket = ticket;
     }
 
     public String getLink() {
@@ -51,14 +61,23 @@ public class TicketProvider {
         this.link = link;
     }
 
-    @OneToMany
-    @JoinTable(name = "section", joinColumns = @JoinColumn(name = "id"),
-            inverseJoinColumns = @JoinColumn(name = "tp_id"))
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "tp_id")
     public List<Section> getSectionList() {
         return sectionList;
     }
 
     public void setSectionList(List<Section> sectionList) {
         this.sectionList = sectionList;
+    }
+
+    @Override
+    public String toString() {
+        return "TicketProvider{" +
+                "id=" + id +
+                ", provider=" + provider +
+                ", link='" + link + '\'' +
+                ", sectionList=" + sectionList +
+                '}';
     }
 }

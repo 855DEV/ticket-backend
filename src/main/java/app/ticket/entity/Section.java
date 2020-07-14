@@ -12,7 +12,16 @@ public class Section {
     private String description;
     private List<TicketItem> ticketItemList;
 
+    public Section() {
+    }
+
+    public Section(Date time, String description) {
+        this.time = time;
+        this.description = description;
+    }
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic
     @Column(name = "id")
     public Integer getId() {
@@ -43,14 +52,23 @@ public class Section {
         this.description = description;
     }
 
-    @OneToMany
-    @JoinTable(name = "ticket_item", joinColumns = @JoinColumn(name = "id"),
-            inverseJoinColumns = @JoinColumn(name = "section_id"))
+    @OneToMany(cascade = {CascadeType.PERSIST})
+    @JoinColumn(name = "section_id")
     public List<TicketItem> getTicketItemList() {
         return ticketItemList;
     }
 
     public void setTicketItemList(List<TicketItem> ticketItemList) {
         this.ticketItemList = ticketItemList;
+    }
+
+    @Override
+    public String toString() {
+        return "Section{" +
+                "id=" + id +
+                ", time=" + time +
+                ", description='" + description + '\'' +
+                ", ticketItemList=" + ticketItemList +
+                '}';
     }
 }
