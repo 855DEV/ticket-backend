@@ -1,6 +1,7 @@
 package app.ticket.entity;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -13,8 +14,7 @@ public class Ticket {
     private String city;
     private Date startDate;
     private Date endDate;
-    private List<Provider> provider;
-    private List<TicketProvider> ticketProviderList;
+    private List<TicketProvider> ticketProviders = new ArrayList<>();
 
     @Id
     @Basic
@@ -76,27 +76,26 @@ public class Ticket {
         this.endDate = endDate;
     }
 
-    @ManyToMany
-    @JoinTable(name = "ticket_provider",
-            joinColumns = @JoinColumn(name = "ticket_id"),
-            inverseJoinColumns = @JoinColumn(name = "provider_id"))
-    public List<Provider> getProvider() {
-        return provider;
+
+    @OneToMany(mappedBy = "ticket", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    public List<TicketProvider> getTicketProviders() {
+        return ticketProviders;
     }
 
-    public void setProvider(List<Provider> provider) {
-        this.provider = provider;
+    public void setTicketProviders(List<TicketProvider> ticketProviderList) {
+        this.ticketProviders = ticketProviderList;
     }
 
-    @OneToMany
-    @JoinTable(name = "ticket_provider",
-            joinColumns = @JoinColumn(name = "ticket_id"),
-            inverseJoinColumns = @JoinColumn(name = "provider_id"))
-    public List<TicketProvider> getTicketProviderList() {
-        return ticketProviderList;
-    }
-
-    public void setTicketProviderList(List<TicketProvider> ticketProviderList) {
-        this.ticketProviderList = ticketProviderList;
+    @Override
+    public String toString() {
+        return "Ticket{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", place='" + place + '\'' +
+                ", city='" + city + '\'' +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", ticketProviders=" + ticketProviders +
+                '}';
     }
 }

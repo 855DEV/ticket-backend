@@ -10,7 +10,16 @@ public class TicketItem {
     private BigDecimal price;
     private String description;
 
+    public TicketItem() {
+    }
+
+    public TicketItem(BigDecimal price, String description) {
+        this.price = price;
+        this.description = description;
+    }
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic
     @Column(name = "id")
     public Integer getId() {
@@ -39,5 +48,14 @@ public class TicketItem {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        return "TicketItem{" +
+                "id=" + id +
+                ", price=" + price +
+                ", description='" + description + '\'' +
+                '}';
     }
 }
