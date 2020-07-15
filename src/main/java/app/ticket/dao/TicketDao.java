@@ -8,5 +8,7 @@ public interface TicketDao {
 
     List<Ticket> findAll();
 
+    Ticket findOne(Integer id);
+
     Ticket insertOne(Ticket ticket);
 }

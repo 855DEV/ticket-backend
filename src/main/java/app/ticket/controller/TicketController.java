@@ -8,22 +8,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/ticket/")
+@RequestMapping("/ticket")
 public class TicketController {
     @Autowired
     TicketService ticketService;
 
-    @GetMapping("/all")
+    @GetMapping
     public List<JSONObject> findAll() {
+        System.out.println("GET /ticket");
         return ticketService.findAll().parallelStream().map(this::wrapTicket).collect(Collectors.toList());
     }
 
-    @PostMapping("/insert")
+    @GetMapping("/{id}")
+    public JSONObject findOne(@PathVariable("id") Integer id) {
+        System.out.println("GET /ticket/");
+        Ticket ticket = ticketService.findOne(id);
+        return wrapTicket(ticket);
+    }
+
+    @PostMapping
     public JSONObject insertOne(@RequestBody JSONObject ticketJson) {
+        System.out.println("POST /ticket\n" + ticketJson);
         Ticket ticket = ticketService.insertOne(ticketJson);
         System.out.println("insert successfully");
         System.out.println(ticket);
@@ -31,6 +39,7 @@ public class TicketController {
     }
 
     private JSONObject wrapTicket(Ticket ticket) {
+        if (ticket == null) return null;
         JSONObject json = new JSONObject();
         json.put("id", ticket.getId());
         json.put("name", ticket.getName());

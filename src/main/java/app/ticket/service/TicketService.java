@@ -8,5 +8,7 @@ import java.util.List;
 public interface TicketService {
     List<Ticket> findAll();
 
+    Ticket findOne(Integer id);
+
     Ticket insertOne(JSONObject ticket);
 }
