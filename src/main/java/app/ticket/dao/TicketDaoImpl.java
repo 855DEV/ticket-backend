@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class TicketDaoImpl implements TicketDao{
+public class TicketDaoImpl implements TicketDao {
 
     @Autowired
     private TicketRepository ticketRepository;
@@ -19,10 +19,15 @@ public class TicketDaoImpl implements TicketDao{
     }
 
     @Override
+    public Ticket findOne(Integer id) {
+        return ticketRepository.getOne(id);
+    }
+
+    @Override
     public Ticket insertOne(Ticket ticket) {
         try {
             return ticketRepository.save(ticket);
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
