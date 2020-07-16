@@ -65,4 +65,14 @@ public class Orders {
     public void setOrderItemList(List<OrderItem> orderItemList) {
         this.orderItemList = orderItemList;
     }
+
+    @Override
+    public String toString() {
+        return "Orders{" +
+                "id=" + id + '\'' +
+                ", uid='" + user + '\'' +
+                ", time='" + time + '\'' +
+                ", price='" + price + '\'' +
+                '}';
+    }
 }
