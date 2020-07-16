@@ -19,6 +19,11 @@ public class TicketDaoImpl implements TicketDao{
     }
 
     @Override
+    public Ticket findOne(Integer id) {
+        return ticketRepository.getOne(id);
+    }
+
+    @Override
     public Ticket insertOne(Ticket ticket) {
         try {
             return ticketRepository.save(ticket);
