@@ -1,10 +1,12 @@
-package app.ticket.entity;
+package app.user.entity;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "user")
-public class Provider {
+public class User {
     private Integer id;
     private Integer type = new Integer(1);
     private String nickname;
@@ -14,8 +16,11 @@ public class Provider {
     private String username;
     private String password;
     private Boolean blocked;
+    private List<Orders> userOrders = new ArrayList<>();
 
+    @Id
     @Basic
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     public Integer getId() {
         return id;
@@ -95,6 +100,15 @@ public class Provider {
         this.blocked = blocked;
     }
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    public List<Orders> getOrders() {
+        return userOrders;
+    }
+
+    public void setOrders(List<Orders> userOrders) {
+        this.userOrders = userOrders;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -107,6 +121,7 @@ public class Provider {
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", blocked='" + blocked + '\'' +
+                ", userOrders='" + userOrders + '\'' +
                 '}';
     }
 }
