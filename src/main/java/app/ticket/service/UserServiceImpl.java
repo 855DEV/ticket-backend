@@ -3,6 +3,7 @@ package app.ticket.service;
 import app.ticket.dao.UserDao;
 import app.ticket.entity.User;
 import com.alibaba.fastjson.JSONObject;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +13,7 @@ public class UserServiceImpl implements UserService {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public UserServiceImpl(UserDao userDao,
-                          BCryptPasswordEncoder bCryptPasswordEncoder) {
+                           BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userDao = userDao;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
@@ -26,10 +27,6 @@ public class UserServiceImpl implements UserService {
     public User insertOne(JSONObject userJson) {
         User user = new User();
 
-        String typeS = userJson.getString("type");
-        Integer type;
-        type = (typeS == null) ? 1 : Integer.valueOf(typeS);
-
         String nickname = userJson.getString("nickname");
         String email = userJson.getString("email");
         String phone = userJson.getString("phone");
@@ -38,7 +35,6 @@ public class UserServiceImpl implements UserService {
         String password = bCryptPasswordEncoder.encode(userJson.getString("password"));
         user.setPassword((user.getPassword()));
 
-        user.setType(type);
         user.setNickname(nickname);
         user.setEmail(email);
         user.setPhone(phone);
@@ -47,5 +43,12 @@ public class UserServiceImpl implements UserService {
         user.setPassword(password);
 
         return userDao.insertOne(user);
+    }
+
+    @Override
+    public User getAuthedUser() {
+        String username =
+                (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return getUserByUsername(username);
     }
 }

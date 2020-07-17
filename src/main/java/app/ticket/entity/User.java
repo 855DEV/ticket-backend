@@ -15,7 +15,7 @@ public class User {
     private String address;
     private String username;
     private String password;
-    private Boolean blocked;
+    private Boolean blocked = false;
     private List<Orders> userOrders = new ArrayList<>();
 
     @Id
@@ -131,7 +131,6 @@ public class User {
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", blocked='" + blocked + '\'' +
-                ", userOrders='" + userOrders + '\'' +
                 '}';
     }
 }
