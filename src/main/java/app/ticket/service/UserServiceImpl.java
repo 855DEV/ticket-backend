@@ -46,6 +46,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public boolean deleteOne(Integer userId) {
+        try {
+            userDao.deleteOne(userId);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
     public User getAuthedUser() {
         String username =
                 (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
