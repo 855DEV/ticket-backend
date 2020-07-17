@@ -48,4 +48,14 @@ public class UserServiceImpl implements UserService {
 
         return userDao.insertOne(user);
     }
+
+    @Override
+    public boolean deleteOne(Integer userId) {
+        try {
+            userDao.deleteOne(userId);
+        }catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
 }

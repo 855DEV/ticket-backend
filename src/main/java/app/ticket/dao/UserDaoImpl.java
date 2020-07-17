@@ -26,4 +26,8 @@ public class UserDaoImpl implements UserDao {
         }
     }
 
+    @Override
+    public void deleteOne(Integer userId) throws IllegalArgumentException {
+        userRepository.deleteById(userId);
+    }
 }

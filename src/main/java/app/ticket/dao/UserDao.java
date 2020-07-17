@@ -5,4 +5,5 @@ import app.ticket.entity.*;
 public interface UserDao {
     User insertOne(User user);
     User findUserByUsername(String username);
+    void deleteOne(Integer userId);
 }

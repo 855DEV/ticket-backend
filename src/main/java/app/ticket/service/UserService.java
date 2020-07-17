@@ -7,4 +7,6 @@ public interface UserService {
     User getUserByUsername(String username);
 
     User insertOne(JSONObject userJson);
+
+    boolean deleteOne(Integer userId);
 }
