@@ -7,4 +7,9 @@ public interface UserService {
     User getUserByUsername(String username);
 
     User insertOne(JSONObject userJson);
+
+    /**
+     * Returns the authenticated User in current context
+     */
+    User getAuthedUser();
 }
