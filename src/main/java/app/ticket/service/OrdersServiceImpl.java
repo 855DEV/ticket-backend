@@ -32,7 +32,7 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     @Override
-    public Orders addOne(JSONObject orderJSON) {
+    public Orders addOne(User user, JSONObject orderJSON) {
         Orders order = new Orders();
         JSONArray itemsJson = orderJSON.getJSONArray("items");
         BigDecimal price = new BigDecimal(0);
@@ -51,7 +51,7 @@ public class OrdersServiceImpl implements OrdersService {
             price = price.add(tmp);
         }
         order.setOrderItemList(items);
-        order.setUser(null);//TODO
+        order.setUser(user);
         order.setPrice(price);
         order.setTime(new Date());  // current datetime
         return ordersDao.addOne(order);

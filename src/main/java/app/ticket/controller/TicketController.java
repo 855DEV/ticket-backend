@@ -2,9 +2,13 @@ package app.ticket.controller;
 
 import app.ticket.entity.Section;
 import app.ticket.entity.Ticket;
+import app.ticket.entity.User;
 import app.ticket.service.TicketService;
+import app.ticket.service.UserService;
 import com.alibaba.fastjson.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,8 +17,13 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/ticket")
 public class TicketController {
-    @Autowired
     TicketService ticketService;
+    UserService userService;
+
+    public TicketController(TicketService ticketService, UserService userService) {
+        this.ticketService = ticketService;
+        this.userService = userService;
+    }
 
     @GetMapping
     public List<JSONObject> findAll() {
@@ -24,18 +33,26 @@ public class TicketController {
 
     @GetMapping("/{id}")
     public JSONObject findOne(@PathVariable("id") Integer id) {
-        System.out.println("GET /ticket/");
+        System.out.println("GET /ticket/" + id);
         Ticket ticket = ticketService.findOne(id);
         return wrapTicket(ticket);
     }
 
-    @PostMapping
-    public JSONObject insertOne(@RequestBody JSONObject ticketJson) {
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> insertOne(@RequestBody JSONObject ticketJson) {
+        User user = userService.getAuthedUser();
+        System.out.println("POST /ticket\n" + user + "\n" + ticketJson);
+        if (user == null || user.getType() != 0) {
+            JSONObject res = new JSONObject();
+            res.put("code", -1);
+            res.put("message", "Access denied.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res.toJSONString());
+        }
         System.out.println("POST /ticket\n" + ticketJson);
         Ticket ticket = ticketService.insertOne(ticketJson);
         System.out.println("insert successfully");
         System.out.println(ticket);
-        return wrapTicket(ticket);
+        return ResponseEntity.ok(wrapTicket(ticket).toJSONString());
     }
 
     private JSONObject wrapTicket(Ticket ticket) {

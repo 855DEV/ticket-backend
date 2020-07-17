@@ -13,13 +13,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/user")
 public class UserController {
-    private UserService userService;
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final UserService userService;
 
-    public UserController(UserService userService,
-                          BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     @PostMapping("/register")

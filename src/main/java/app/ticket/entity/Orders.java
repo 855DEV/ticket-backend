@@ -1,5 +1,7 @@
 package app.ticket.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -16,7 +18,7 @@ public class Orders {
     List<OrderItem> orderItemList = new ArrayList<>();
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic
     @Column(name = "id")
     public Integer getId() {
@@ -39,6 +41,7 @@ public class Orders {
 
     @ManyToOne
     @JoinColumn(name = "uid")
+    @JsonIgnore
     public User getUser() {
         return user;
     }

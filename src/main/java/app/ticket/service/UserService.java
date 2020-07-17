@@ -9,4 +9,8 @@ public interface UserService {
     User insertOne(JSONObject userJson);
 
     boolean deleteOne(Integer userId);
+    /**
+     * Returns the authenticated User in current context
+     */
+    User getAuthedUser();
 }
