@@ -12,6 +12,7 @@ public class Ticket {
     private Integer id;
     private String name;
     private String place;
+    private String category;
     private String city;
     private Date startDate;
     private Date endDate;
@@ -60,6 +61,16 @@ public class Ticket {
         this.place = place;
     }
 
+    @Basic
+    @Column(name = "category")
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+    
     @Basic
     @Column(name = "city")
     public String getCity() {
