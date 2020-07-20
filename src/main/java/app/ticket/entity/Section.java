@@ -1,5 +1,7 @@
 package app.ticket.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
@@ -10,6 +12,7 @@ public class Section {
     private Integer id;
     private Date time;
     private String description;
+    private TicketProvider tp;
     private List<TicketItem> ticketItemList;
 
     public Section() {
@@ -50,6 +53,17 @@ public class Section {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "tp_id", nullable = false)
+    @JsonIgnore
+    public TicketProvider getTicketProvider() {
+        return tp;
+    }
+
+    public void setTicketProvider(TicketProvider tp) {
+        this.tp = tp;
     }
 
     @OneToMany(cascade = {CascadeType.PERSIST})
