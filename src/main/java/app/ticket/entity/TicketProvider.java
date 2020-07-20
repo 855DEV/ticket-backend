@@ -53,6 +53,8 @@ public class TicketProvider {
         this.ticket = ticket;
     }
 
+    @Basic
+    @Column(name = "link")
     public String getLink() {
         return link;
     }
