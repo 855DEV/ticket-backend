@@ -1,7 +1,7 @@
 package app.ticket.controller;
 
 import app.ticket.entity.*;
-import app.ticket.service.OrderService;
+import app.ticket.service.OrdersService;
 import app.ticket.service.UserService;
 import app.ticket.service.TicketService;
 
@@ -18,7 +18,7 @@ import java.util.*;
 public class RecommendController {
     private final UserService userService;
     private final TicketService ticketService;
-    private final OrderService orderService;
+    private final OrdersService ordersService;
 
     public RecommendController(OrdersService ordersService, UserService userService, TicketService ticketService) {
         this.ordersService = ordersService;
@@ -26,11 +26,11 @@ public class RecommendController {
         this.ticketService = ticketService;
     }
 
-    @Getmapping("/{n}")
+    @GetMapping("/{n}")
     public List<JSONObject> getRecommendList(@PathVariable("n") Integer n) {
         User user = userService.getAuthedUser();
         List<Ticket> ticketList = ticketService.findAll();
-        List<Orders> orderList = orderService.getOrdersByUser();
+        List<Orders> orderList = ordersService.getOrdersByUser();
 
         Map<String, List<Ticket>> ticketTable = new HashMap<>();
         Map<String, Integer> orderCnt;
