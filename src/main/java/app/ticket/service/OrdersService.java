@@ -10,4 +10,6 @@ public interface OrdersService {
     List<Orders> getUserOrders(Integer userId);
 
     Orders addOne(User user, JSONObject order);
+
+    Orders addOne(Orders order);
 }

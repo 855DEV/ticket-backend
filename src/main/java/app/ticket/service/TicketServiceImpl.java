@@ -81,6 +81,11 @@ public class TicketServiceImpl implements TicketService {
         return ticketDao.insertOne(ticket);
     }
 
+    @Override
+    public Ticket insertOne(Ticket ticket) {
+        return ticketDao.insertOne(ticket);
+    }
+
     private Section parseSectionFromJson(JSONObject json) {
         String description = json.getString("description");
         String timeString = json.getString("time");

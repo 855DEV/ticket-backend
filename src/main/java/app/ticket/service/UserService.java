@@ -8,6 +8,8 @@ public interface UserService {
 
     User insertOne(JSONObject userJson);
 
+    User insertOne(User user);
+
     boolean deleteOne(Integer userId);
     /**
      * Returns the authenticated User in current context

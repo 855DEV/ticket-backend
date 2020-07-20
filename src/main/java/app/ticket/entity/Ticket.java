@@ -4,6 +4,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "ticket")
@@ -15,6 +16,17 @@ public class Ticket {
     private Date startDate;
     private Date endDate;
     private List<TicketProvider> ticketProviders = new ArrayList<>();
+
+    public Ticket() {
+    }
+
+    public Ticket(String name, String place, String city, Date startDate, Date endDate) {
+        this.name = name;
+        this.place = place;
+        this.city = city;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
 
     @Id
     @Basic
@@ -97,5 +109,13 @@ public class Ticket {
                 ", endDate=" + endDate +
                 ", ticketProviders=" + ticketProviders +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Ticket ticket = (Ticket) o;
+        return id.equals(ticket.id);
     }
 }

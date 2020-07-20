@@ -18,11 +18,14 @@ import java.util.stream.Collectors;
 
 @Service
 public class OrdersServiceImpl implements OrdersService {
-    @Autowired
-    OrdersDao ordersDao;
 
-    @Autowired
-    TicketItemDao ticketItemDao;
+    private OrdersDao ordersDao;
+    private TicketItemDao ticketItemDao;
+
+    public OrdersServiceImpl(OrdersDao ordersDao, TicketItemDao ticketItemDao) {
+        this.ordersDao = ordersDao;
+        this.ticketItemDao = ticketItemDao;
+    }
 
     @Override
     public List<Orders> getUserOrders(Integer userId) {
@@ -44,7 +47,7 @@ public class OrdersServiceImpl implements OrdersService {
             return new OrderItem(order, ticketItem, amount);
         }).collect(Collectors.toList());
         // calculate the total price
-        for (OrderItem i: items) {
+        for (OrderItem i : items) {
             TicketItem t = i.getTicketItem();
             BigDecimal tmp =
                     t.getPrice().multiply(new BigDecimal(i.getAmount()));
@@ -54,6 +57,11 @@ public class OrdersServiceImpl implements OrdersService {
         order.setUser(user);
         order.setPrice(price);
         order.setTime(new Date());  // current datetime
+        return ordersDao.addOne(order);
+    }
+
+    @Override
+    public Orders addOne(Orders order) {
         return ordersDao.addOne(order);
     }
 }

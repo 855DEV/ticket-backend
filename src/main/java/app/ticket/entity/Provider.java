@@ -9,7 +9,16 @@ public class Provider {
     private String name;
     private String link;
 
+    public Provider() {
+    }
+
+    public Provider(String name, String link) {
+        this.name = name;
+        this.link = link;
+    }
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic
     @Column(name = "id")
     public Integer getId() {

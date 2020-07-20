@@ -21,6 +21,14 @@ public class TicketProvider {
     private String link;
     private List<Section> sectionList = new ArrayList<>();
 
+    public TicketProvider() {
+    }
+
+    public TicketProvider(Provider provider, Ticket ticket) {
+        this.provider = provider;
+        this.ticket = ticket;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
