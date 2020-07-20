@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.stream.*;
 
 @RestController
 @RequestMapping("/recommend")
@@ -26,14 +27,32 @@ public class RecommendController {
         this.ticketService = ticketService;
     }
 
-    @GetMapping("/{n}")
-    public List<JSONObject> getRecommendList(@PathVariable("n") Integer n) {
+    /*@GetMapping("/{n}")
+    public List<JSONObject> getSearch(@PathVariable("n") Integer n) {
         User user = userService.getAuthedUser();
         List<Ticket> ticketList = ticketService.findAll();
         List<Orders> orderList = ordersService.getOrdersByUser();
 
         Map<String, List<Ticket>> ticketTable = new HashMap<>();
-        Map<String, Integer> orderCnt;
+        Map<String, Integer> orderCnt = new HashMap<>();
+        for (Ticket t : ticketList){
+            String category = t.getCategory();
+            if (!ticketTable.containsKey(category)) {
+                ticketTable.put(category, new ArrayList<>());
+                orderCnt.put(category, 0);
+            }
+            ticketTable.get(category).add(t);
+        }
+    }*/
+
+    @GetMapping("/{n}")
+    public List<JSONObject> getRecommendList(@PathVariable("n") Integer n) {
+        User user = userService.getAuthedUser();
+        List<Ticket> ticketList = ticketService.findAll();
+        List<Orders> orderList = user.getOrders();
+
+        Map<String, List<Ticket>> ticketTable = new HashMap<>();
+        Map<String, Integer> orderCnt = new HashMap<>();
         for (Ticket t : ticketList){
             String category = t.getCategory();
             if (!ticketTable.containsKey(category)) {
@@ -66,7 +85,7 @@ public class RecommendController {
         List<Ticket> result = new ArrayList<>();
         Integer dif = 0;
         Integer currentTicketSize = 0, currentParsedOrder = 0;
-        for (String key : orderCnt){
+        for (String key : orderCnt.keySet()){
             Integer need = currentTicketSize;
             currentParsedOrder += orderCnt.get(key);
             while (need.doubleValue() / n < currentParsedOrder.doubleValue() / orderSize)
@@ -100,7 +119,7 @@ public class RecommendController {
         List<OrderItem> oi = order.getOrderItemList();
         List<Ticket> ret = new ArrayList<>();
         for (OrderItem it : oi){
-            TicketItem ti = it2.getTicketItem();
+            TicketItem ti = it.getTicketItem();
             Section s = ti.getSection();
             TicketProvider tp = s.getTicketProvider();
             Ticket t = tp.getTicket();
@@ -127,6 +146,14 @@ public class RecommendController {
                     return tpJson;
                 }).collect(Collectors.toList()));
         return json;
+    }
+
+    private JSONObject wrapSection(Section section) {
+        JSONObject j = new JSONObject();
+        j.put("description", section.getDescription());
+        j.put("time", section.getTime());
+        j.put("items", section.getTicketItemList());
+        return j;
     }
 
     private List<Integer> randomNumberGenerator(Integer maxValue, Integer number){ // get number values between [0, maxValue)
