@@ -31,10 +31,7 @@ public class UserController {
         Integer delUserId = jsonObject.getInteger("id");
         if (delUserId == null)
             return new Message(-1, "Field id is not specified.");
-        // FIXME: change this 2 lines of code to User user = getAuthedUser();
-        String username =
-                (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = userService.getUserByUsername(username);
+        User user = userService.getAuthedUser();
         // delete oneself or delete issued by admin
         if (user != null && (jsonObject.getInteger("id").equals(user.getId()) || user.getType().equals(0))) {
             if (!userService.deleteOne(delUserId)) {

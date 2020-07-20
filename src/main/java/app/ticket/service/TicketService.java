@@ -11,4 +11,6 @@ public interface TicketService {
     Ticket findOne(Integer id);
 
     Ticket insertOne(JSONObject ticket);
+
+    Ticket insertOne(Ticket ticket);
 }

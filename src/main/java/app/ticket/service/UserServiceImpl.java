@@ -46,6 +46,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User insertOne(User user) {
+        return userDao.insertOne(user);
+    }
+
+    @Override
     public boolean deleteOne(Integer userId) {
         try {
             userDao.deleteOne(userId);
