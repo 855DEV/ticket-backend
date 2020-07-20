@@ -6,9 +6,6 @@ import app.ticket.service.UserService;
 import app.ticket.service.TicketService;
 
 import com.alibaba.fastjson.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -31,7 +28,7 @@ public class RecommendController {
     public List<JSONObject> getSearch(@PathVariable("n") Integer n) {
         User user = userService.getAuthedUser();
         List<Ticket> ticketList = ticketService.findAll();
-        List<Orders> orderList = ordersService.getOrdersByUser();
+        List<Orders> orderList = user.getOrders();
 
         Map<String, List<Ticket>> ticketTable = new HashMap<>();
         Map<String, Integer> orderCnt = new HashMap<>();
@@ -162,7 +159,7 @@ public class RecommendController {
         for (int i = 0; i < maxValue; i++)
             l.add(i);
         Collections.shuffle(l, rand);
-        List<Integer> ret;
+        List<Integer> ret = new ArrayList<>();
         for (int i = 0; i < number; i++)
             ret.add(l.get(i));
         return ret;
