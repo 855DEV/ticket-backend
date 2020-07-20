@@ -1,5 +1,7 @@
 package app.ticket.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 
@@ -9,6 +11,7 @@ public class TicketItem {
     private Integer id;
     private BigDecimal price;
     private String description;
+    private Section section;
 
     public TicketItem() {
     }
@@ -48,6 +51,17 @@ public class TicketItem {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "section_id", nullable = false)
+    @JsonIgnore
+    public Section getSection() {
+        return section;
+    }
+
+    public void setSection(Section section) {
+        this.section = section;
     }
 
     @Override
