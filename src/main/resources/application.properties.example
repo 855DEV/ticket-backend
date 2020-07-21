@@ -9,3 +9,5 @@ spring.datasource.hikari.maxLifetime=180000
 # Detailed SQL log
 logging.level.org.hibernate.SQL=DEBUG
 logging.level.org.hibernate.type.descriptor.sql.BasicBinder=TRACE
+# MongoDB
+spring.data.mongodb.uri=mongodb://username:password@host:port/TicketStore
