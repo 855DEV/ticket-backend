@@ -24,23 +24,29 @@ public class RecommendController {
         this.ticketService = ticketService;
     }
 
-    /*@GetMapping("/{n}")
-    public List<JSONObject> getSearch(@PathVariable("n") Integer n) {
-        User user = userService.getAuthedUser();
+    @GetMapping("/{searchText}")
+    public List<JSONObject> getSearch(@PathVariable("searchText") String text) {
         List<Ticket> ticketList = ticketService.findAll();
-        List<Orders> orderList = user.getOrders();
-
-        Map<String, List<Ticket>> ticketTable = new HashMap<>();
-        Map<String, Integer> orderCnt = new HashMap<>();
+        String sText[] = text.split(" ");
+        List<Ticket> res[] = new List[10];
+        for (int i = 0; i < 10; i++)
+            res[i] = new ArrayList<>();
         for (Ticket t : ticketList){
-            String category = t.getCategory();
-            if (!ticketTable.containsKey(category)) {
-                ticketTable.put(category, new ArrayList<>());
-                orderCnt.put(category, 0);
+            Integer cnt = 0;
+            for (String s : sText){
+                if (s.length() == 0) continue;
+                if (t.getName().contains(s) || t.getPlace().contains(s) || t.getCategory().contains(s) || t.getCity().contains(s))
+                    cnt++;
             }
-            ticketTable.get(category).add(t);
+            res[cnt].add(t);
         }
-    }*/
+        List<JSONObject> j = new ArrayList<>();
+        for (int i = 9; i > 0; i--) {
+            for (Ticket t : res[i])
+                j.add(wrapTicket(t));
+        }
+        return j;
+    }
 
     @GetMapping("/{n}")
     public List<JSONObject> getRecommendList(@PathVariable("n") Integer n) {
