@@ -24,32 +24,8 @@ public class RecommendController {
         this.ticketService = ticketService;
     }
 
-    @GetMapping("/{searchText}")
-    public List<JSONObject> getSearch(@PathVariable("searchText") String text) {
-        List<Ticket> ticketList = ticketService.findAll();
-        String sText[] = text.split(" ");
-        List<Ticket> res[] = new List[10];
-        for (int i = 0; i < 10; i++)
-            res[i] = new ArrayList<>();
-        for (Ticket t : ticketList){
-            Integer cnt = 0;
-            for (String s : sText){
-                if (s.length() == 0) continue;
-                if (t.getName().contains(s) || t.getPlace().contains(s) || t.getCategory().contains(s) || t.getCity().contains(s))
-                    cnt++;
-            }
-            res[cnt].add(t);
-        }
-        List<JSONObject> j = new ArrayList<>();
-        for (int i = 9; i > 0; i--) {
-            for (Ticket t : res[i])
-                j.add(wrapTicket(t));
-        }
-        return j;
-    }
-
-    @GetMapping("/{n}")
-    public List<JSONObject> getRecommendList(@PathVariable("n") Integer n) {
+    @GetMapping
+    public List<JSONObject> getRecommendList(@RequestParam(value="n",defaultValue="10") Integer n) {
         User user = userService.getAuthedUser();
         List<Ticket> ticketList = ticketService.findAll();
         List<Orders> orderList = user.getOrders();
