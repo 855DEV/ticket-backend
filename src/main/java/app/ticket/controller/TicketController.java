@@ -72,6 +72,7 @@ public class TicketController {
                                 tp.getSectionList().parallelStream().map(this::wrapSection).collect(Collectors.toList()));
                     return tpJson;
                 }).collect(Collectors.toList()));
+        json.put("image", ticket.getImage());
         return json;
     }
 

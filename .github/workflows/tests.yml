@@ -1,9 +1,9 @@
-name: Feature Branch
+name: Tests
 on:
   push:
-    branches-ignore:
+    branches:
       - 'master'
-      - 'release*'
+      - 'dev'
 jobs:
   test:
     name: Unit Test
@@ -13,7 +13,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 13
+          java-version: 14
       - name: Maven Package
         run: mvn -B clean package -DskipTests
       - name: Maven Verify

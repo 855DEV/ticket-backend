@@ -16,6 +16,8 @@ public class Ticket {
     private Date startDate;
     private Date endDate;
     private List<TicketProvider> ticketProviders = new ArrayList<>();
+    private String image;
+    private String intro;
 
     public Ticket() {
     }
@@ -96,6 +98,24 @@ public class Ticket {
 
     public void setTicketProviders(List<TicketProvider> ticketProviderList) {
         this.ticketProviders = ticketProviderList;
+    }
+
+    @Transient
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    @Transient
+    public String getIntro() {
+        return intro;
+    }
+
+    public void setIntro(String intro) {
+        this.intro = intro;
     }
 
     @Override
