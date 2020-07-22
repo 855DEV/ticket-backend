@@ -6,6 +6,8 @@ import app.ticket.service.UserService;
 import app.ticket.util.Message;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -20,9 +22,17 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public User register(@RequestBody JSONObject jsonObject) {
+    public ResponseEntity<String> register(@RequestBody JSONObject jsonObject) {
         System.out.println("POST /register\n" + jsonObject);
-        return userService.insertOne(jsonObject);
+        User tmp = userService.getUserByUsername(jsonObject.getString("username"));
+        if (tmp != null){
+            JSONObject m = new JSONObject();
+            m.put("code", -1);
+            m.put("message", "Username has been registered.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(m.toJSONString());
+        }
+        User user = userService.insertOne(jsonObject);
+        return ResponseEntity.ok(wrapUser(user).toJSONString());
     }
 
     @DeleteMapping
@@ -39,5 +49,20 @@ public class UserController {
             } else return new Message(0, "OK");
         }
         return new Message(-1, "Access denied.");
+    }
+
+    private JSONObject wrapUser(User user){
+        if (user == null) return null;
+        JSONObject j = new JSONObject();
+        j.put("id", user.getId());
+        j.put("type", user.getType());
+        j.put("nickname", user.getNickname());
+        j.put("email", user.getEmail());
+        j.put("phone", user.getPhone());
+        j.put("address", user.getAddress());
+        j.put("username", user.getUsername());
+        j.put("password", user.getPassword());
+        j.put("blocked", user.getBlocked());
+        return j;
     }
 }
