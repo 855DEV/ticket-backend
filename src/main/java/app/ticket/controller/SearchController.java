@@ -20,10 +20,9 @@ public class SearchController {
     }
 
     @GetMapping
-    public List<JSONObject> getSearch(@RequestBody JSONObject textJSON) {
+    public List<JSONObject> getSearch(@RequestParam(value="s") String text) {
         List<Ticket> ticketList = ticketService.findAll();
-        String text = textJSON.getString("text");
-        String sText[] = text.replace("{","").replace("}","").split(" ");
+        String sText[] = text.split(" ");
         List<Ticket> res[] = new List[10];
         for (int i = 0; i < 10; i++)
             res[i] = new ArrayList<>();
