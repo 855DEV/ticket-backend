@@ -61,6 +61,8 @@ public class UserServiceImpl implements UserService {
     }
 
     public User getAuthedUser() {
+        if (SecurityContextHolder.getContext() == null || SecurityContextHolder.getContext().getAuthentication() == null)
+            return null;
         String username =
                 (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return getUserByUsername(username);

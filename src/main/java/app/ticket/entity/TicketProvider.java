@@ -41,7 +41,7 @@ public class TicketProvider {
     }
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "provider_id")
+    @JoinColumn(name = "provider_id", nullable = false)
     public Provider getProvider() {
         return provider;
     }
