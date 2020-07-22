@@ -4,7 +4,6 @@ import app.ticket.entity.Ticket;
 import app.ticket.entity.TicketDetail;
 import app.ticket.repository.TicketDetailRepository;
 import app.ticket.repository.TicketRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

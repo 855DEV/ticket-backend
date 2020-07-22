@@ -11,6 +11,7 @@ public interface UserService {
     User insertOne(User user);
 
     boolean deleteOne(Integer userId);
+
     /**
      * Returns the authenticated User in current context
      */
