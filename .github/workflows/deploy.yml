@@ -36,6 +36,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+            java-version: 14
+      - name: Build with Maven
+        run: mvn -B package -Pprod --file pom.xml -DskipTests
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
