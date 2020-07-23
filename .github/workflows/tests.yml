@@ -1,16 +1,22 @@
-name: Tests
+name: Test and Build
 on: [push, pull_request]
 jobs:
   test:
     name: Unit Test
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
           java-version: 14
-      - name: Maven Package
-        run: mvn -B clean package -DskipTests
-      - name: Maven Verify
-        run: mvn -B clean verify
+      - name: Cache Maven packages
+          uses: actions/cache@v2
+          with:
+            path: ~/.m2
+            key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+            restore-keys: ${{ runner.os }}-m2
+      - name: Unit Test
+        run: mvn test
+      - name: Build with Maven
+        run: mvn -B package -Pprod --file pom.xml -DskipTests
