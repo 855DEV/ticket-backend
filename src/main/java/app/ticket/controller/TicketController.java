@@ -2,15 +2,19 @@ package app.ticket.controller;
 
 import app.ticket.entity.Section;
 import app.ticket.entity.Ticket;
+import app.ticket.entity.TicketItem;
 import app.ticket.entity.User;
 import app.ticket.service.TicketService;
 import app.ticket.service.UserService;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,11 +52,12 @@ public class TicketController {
             res.put("message", "Access denied.");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res.toJSONString());
         }
-        System.out.println("POST /ticket\n" + ticketJson);
         Ticket ticket = ticketService.insertOne(ticketJson);
-        System.out.println("insert successfully");
+        System.out.println("insert successfully:");
         System.out.println(ticket);
-        return ResponseEntity.ok(wrapTicket(ticket).toJSONString());
+        JSONObject wrappedTicket = wrapTicket(ticket);
+        String response = wrappedTicket.toJSONString();
+        return ResponseEntity.ok(response);
     }
 
     private JSONObject wrapTicket(Ticket ticket) {
@@ -62,16 +67,21 @@ public class TicketController {
         json.put("name", ticket.getName());
         json.put("startDate", ticket.getStartDate());
         json.put("endDate", ticket.getEndDate());
-        json.put("providers", ticket.getTicketProviders().parallelStream()
+        List<JSONObject> providersJson =
+                ticket.getTicketProviders().parallelStream()
                 .map((tp) -> {
                     JSONObject tpJson = new JSONObject();
                     tpJson.put("id", tp.getProvider().getId());
                     tpJson.put("name", tp.getProvider().getName());
-                    if (tp.getSectionList() != null)
-                        tpJson.put("sections",
-                                tp.getSectionList().parallelStream().map(this::wrapSection).collect(Collectors.toList()));
+                    List<JSONObject> sectionJson =
+                            tp.getSectionList().parallelStream().map(this::wrapSection).collect(Collectors.toList());
+                    JSONArray sections = new JSONArray();
+                    sections.addAll(sectionJson);
+                    tpJson.put("sections", sections);
                     return tpJson;
-                }).collect(Collectors.toList()));
+                }).collect(Collectors.toList());
+        JSONArray providers = new JSONArray(Collections.singletonList(providersJson));
+        json.put("providers", providers);
         json.put("image", ticket.getImage());
         return json;
     }
@@ -80,7 +90,18 @@ public class TicketController {
         JSONObject j = new JSONObject();
         j.put("description", section.getDescription());
         j.put("time", section.getTime());
-        j.put("items", section.getTicketItemList());
+        List<JSONObject> ticketItemList =
+                section.getTicketItemList().parallelStream().map(this::wrapTicketItem).collect(Collectors.toList());
+        JSONArray ticketItems =
+                new JSONArray(Collections.singletonList(ticketItemList));
+        j.put("items", ticketItems);
+        return j;
+    }
+
+    private JSONObject wrapTicketItem(TicketItem ticketItem) {
+        JSONObject j = new JSONObject();
+        j.put("price", ticketItem.getPrice());
+        j.put("description",ticketItem.getDescription());
         return j;
     }
 }

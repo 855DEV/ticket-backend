@@ -21,6 +21,12 @@ public class TicketItem {
         this.description = description;
     }
 
+    public TicketItem(BigDecimal price, String description, Section section) {
+        this.price = price;
+        this.description = description;
+        this.section = section;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic
