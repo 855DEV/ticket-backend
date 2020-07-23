@@ -64,7 +64,11 @@ jobs:
           # Build a docker container and
           # push it to ECR so that it can
           # be deployed to ECS.
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+            --build-arg MYSQL_URL=${{ secrets.MYSQL_URL }} \
+            --build-arg MYSQL_USERNAME=${{ secrets.MYSQL_USERNAME }}\
+            --build-arg MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }} \
+            --build-arg MONGO_URL=${{ secrets.MONGO_URL }} .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
       - name: Fill in the new image ID in the Amazon ECS task definition
@@ -72,7 +76,7 @@ jobs:
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: task-definition.json
-          container-name: nginx
+          container-name: ticket-container
           image: ${{ steps.build-image.outputs.image }}
 
       - name: Deploy Amazon ECS task definition
