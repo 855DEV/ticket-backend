@@ -23,7 +23,11 @@
 #    See the documentation for each action used below for the recommended IAM policies for this IAM user,
 #    and best practices on handling the access key credentials.
 
-on: push
+on:
+  push:
+    branches:
+      - master
+      - dev
 
 name: Deploy to Amazon ECS
 
@@ -41,7 +45,7 @@ jobs:
         with:
             java-version: 14
       - name: Build with Maven
-        run: mvn -B package -Pprod --file pom.xml -DskipTests
+        run: mvn -B package -Pprod --file pom.xml
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1

@@ -12,7 +12,8 @@ For safety concerns, `application.properties` file is ignored by `git` and any c
 
 Spring profiles are at `src/main/resources`, `application-local` is for local debug and build and `application-prod
 ` is for production release. `pom.xml`  declares these profiles.
-Run with flag like `-Dspring.profiles.active=local` to enable a local configuration.
+Run with flag like `-Dspring.profiles.active=local` to enable a local configuration (or config it in IDE Run/Debug
+ configurations).
 
 ### Ticket Data
 
