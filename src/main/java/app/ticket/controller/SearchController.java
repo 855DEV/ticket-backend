@@ -61,6 +61,7 @@ public class SearchController {
         }
 
         List<Ticket> ticketList = ticketService.findAll();
+        System.out.println("total ticket number: " + ticketList.size());
         String sText[] = text.split(" ");
         SimpleDateFormat ft = new SimpleDateFormat ("yyyyMMdd");
         Date st = new Date(), en = new Date();
@@ -83,8 +84,8 @@ public class SearchController {
 
         List<myClass> res = new ArrayList<>();
         for (Ticket t : ticketList){
-            if (city != "" && !t.getCity().equals(city)) continue;
-            if (category != "" && !t.getCategory().equals(category)) continue;
+            if (!city.isBlank() && !t.getCity().equals(city)) continue;
+            if (!category.isBlank() && !t.getCategory().equals(category)) continue;
             if (!startDate.isBlank() && !endDate.isBlank()){
                 Date tst = t.getStartDate(), ten = t.getEndDate();
                 if (!((tst.compareTo(st) >= 0 && tst.compareTo(en) <= 0) ||
@@ -95,11 +96,14 @@ public class SearchController {
             }
 
             Integer cnt = 0;
+            //System.out.println("Parse " + t.getName() + ": ");
             for (String s : sText){
                 if (s.length() == 0) continue;
+                //System.out.println("word " + s + ": " + t.getCategory().contains(s));
                 if (t.getName().contains(s) || t.getPlace().contains(s) || t.getCategory().contains(s) || t.getCity().contains(s))
                     cnt++;
             }
+            //System.out.println("res = " + cnt);
             if (cnt == 0) continue;
             res.add(new myClass(t, cnt));
         }
