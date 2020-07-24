@@ -23,12 +23,13 @@ public class Ticket {
     public Ticket() {
     }
 
-    public Ticket(String name, String place, String city, Date startDate, Date endDate) {
+    public Ticket(String name, String place, String city, Date startDate, Date endDate, String category) {
         this.name = name;
         this.place = place;
         this.city = city;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.category = category;
     }
 
     @Id

@@ -8,6 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.fail;
@@ -39,10 +41,21 @@ public class TestContext {
      *                           provider
      * @return Created Ticket object
      */
-    public static Ticket createTicket(ProviderRepository providerRepository) {
-        Ticket ticket = new Ticket("Ticket Name", "place", "city",
-                new Date(), new Date());
+    public static Ticket createTicket(ProviderRepository providerRepository, String name, String place, String city, String st, String en, String cat, Boolean emptyProvider){
+        SimpleDateFormat ft = new SimpleDateFormat("yyyyMMdd");
+        Date startDate = new Date(), endDate = new Date();
+        try{
+            startDate = ft.parse(st); endDate = ft.parse(en);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        Ticket ticket = new Ticket(name, place, city,
+                startDate, endDate, cat);
         List<TicketProvider> tps = new ArrayList<>();
+        if (emptyProvider) {
+            ticket.setTicketProviders(tps);
+            return ticket;
+        }
         TicketProvider tp =
                 new TicketProvider(providerRepository.findAll().get(0), ticket);
         Section sec = new Section(new Date(), "A sample section");
@@ -57,6 +70,9 @@ public class TestContext {
         tps.add(tp);
         ticket.setTicketProviders(tps);
         return ticket;
+    }
+    public static Ticket createTicket(ProviderRepository providerRepository) {
+        return TestContext.createTicket(providerRepository, "name", "place", "city", "19260817", "19890604", "mo", false);
     }
 
     /**
