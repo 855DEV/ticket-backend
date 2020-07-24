@@ -6,7 +6,6 @@ import app.ticket.entity.TicketItem;
 import app.ticket.entity.User;
 import app.ticket.service.TicketService;
 import app.ticket.service.UserService;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.http.HttpStatus;
@@ -83,6 +82,7 @@ public class TicketController {
         JSONArray providers = new JSONArray(Collections.singletonList(providersJson));
         json.put("providers", providers);
         json.put("image", ticket.getImage());
+        json.put("intro", ticket.getIntro());
         return json;
     }
 

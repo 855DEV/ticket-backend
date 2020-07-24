@@ -8,7 +8,6 @@ import app.ticket.entity.TicketItem;
 import app.ticket.entity.User;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -19,8 +18,8 @@ import java.util.stream.Collectors;
 @Service
 public class OrdersServiceImpl implements OrdersService {
 
-    private OrdersDao ordersDao;
-    private TicketItemDao ticketItemDao;
+    private final OrdersDao ordersDao;
+    private final TicketItemDao ticketItemDao;
 
     public OrdersServiceImpl(OrdersDao ordersDao, TicketItemDao ticketItemDao) {
         this.ordersDao = ordersDao;
