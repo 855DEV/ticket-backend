@@ -21,11 +21,18 @@ public class UserController {
         this.userService = userService;
     }
 
+    @GetMapping
+    public User getUserInfo() {
+        User user = userService.getAuthedUser();
+        user.setPassword(""); // remove encrypted password from response
+        return user;
+    }
+
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody JSONObject jsonObject) {
         System.out.println("POST /register\n" + jsonObject);
         User tmp = userService.getUserByUsername(jsonObject.getString("username"));
-        if (tmp != null){
+        if (tmp != null) {
             JSONObject m = new JSONObject();
             m.put("code", -1);
             m.put("message", "Username has been registered.");
@@ -51,7 +58,7 @@ public class UserController {
         return new Message(-1, "Access denied.");
     }
 
-    private JSONObject wrapUser(User user){
+    private JSONObject wrapUser(User user) {
         if (user == null) return null;
         JSONObject j = new JSONObject();
         j.put("id", user.getId());
