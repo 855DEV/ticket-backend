@@ -34,7 +34,7 @@ public class TestContext {
 
     /**
      * Create a simple Ticket object
-     *
+     * The caller must prepare providers before calling the function.
      * @param providerRepository a provider repository with some initialized
      *                           provider
      * @return Created Ticket object
@@ -121,5 +121,10 @@ public class TestContext {
                 .content(loginJson.toJSONString()))
                 .andReturn()
                 .getResponse().getHeader("Authorization");
+    }
+
+    public static User createOneUser(UserRepository userRepository) {
+        User user = new User();
+        return userRepository.save(user);
     }
 }

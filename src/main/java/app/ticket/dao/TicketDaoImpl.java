@@ -11,8 +11,8 @@ import java.util.List;
 @Repository
 public class TicketDaoImpl implements TicketDao {
 
-    private TicketRepository ticketRepository;
-    private TicketDetailRepository ticketDetailRepository;
+    private final TicketRepository ticketRepository;
+    private final TicketDetailRepository ticketDetailRepository;
 
     public TicketDaoImpl(TicketRepository ticketRepository, TicketDetailRepository ticketDetailRepository) {
         this.ticketRepository = ticketRepository;
@@ -30,8 +30,10 @@ public class TicketDaoImpl implements TicketDao {
     public Ticket findOne(Integer id) {
         Ticket ticket = ticketRepository.getOne(id);
         TicketDetail detail = ticketDetailRepository.findByTid(id);
-        ticket.setImage(detail.getImg());
-        ticket.setIntro(detail.getIntro());
+        if(detail != null){
+            ticket.setImage(detail.getImg());
+            ticket.setIntro(detail.getIntro());
+        }
         return ticket;
     }
 

@@ -22,7 +22,7 @@ public class TicketDetail {
         this._id = _id;
     }
 
-    @Field(name = "id")
+    @Field(name = "tid")
     public Integer getTid() {
         return tid;
     }
@@ -47,5 +47,13 @@ public class TicketDetail {
 
     public void setIntro(String intro) {
         this.intro = intro;
+    }
+
+    @Override
+    public String toString() {
+        return "TicketDetail{" +
+                "_id=" + _id +
+                ", tid=" + tid +
+                '}';
     }
 }
