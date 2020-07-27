@@ -9,4 +9,6 @@ public interface OrdersDao {
     Orders addOne(Orders order);
 
     List<Orders> getAllOrdersByUserId(User user);
+
+    List<Orders> findAll();
 }

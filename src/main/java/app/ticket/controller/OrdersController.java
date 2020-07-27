@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("/order")
 public class OrdersController {
@@ -23,13 +25,17 @@ public class OrdersController {
     @GetMapping
     public Object getOrdersByUser() {
         User user = userService.getAuthedUser();
-        return user.getOrders();
+        //System.out.println("GET /orders " + user + "; " + user.getOrders().size());
+        //System.out.println("getOrders: " + ordersService.getUserOrders(user.getId()).size());
+        //return user.getOrders();
+        return ordersService.getUserOrders(user.getId());
     }
 
     @PostMapping
     public JSONObject createOrder(@RequestBody JSONObject info) {
         User user = userService.getAuthedUser();
         System.out.println("POST /orders" + user + " " + info);
+
         ordersService.addOne(user, info);
         return null;
     }

@@ -22,4 +22,7 @@ public class OrdersDaoImpl implements OrdersDao{
     public Orders addOne(Orders order) {
         return ordersRepository.save(order);
     }
+
+    @Override
+    public List<Orders> findAll() {return ordersRepository.findAll();}
 }

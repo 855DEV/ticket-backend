@@ -1,8 +1,7 @@
 package app.ticket.setup;
 
 import app.ticket.entity.*;
-import app.ticket.repository.ProviderRepository;
-import app.ticket.repository.UserRepository;
+import app.ticket.repository.*;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -44,26 +43,28 @@ public class TestContext {
     public static Ticket createTicket(ProviderRepository providerRepository, String name, String place, String city, String st, String en, String cat, Boolean emptyProvider){
         SimpleDateFormat ft = new SimpleDateFormat("yyyyMMdd");
         Date startDate = new Date(), endDate = new Date();
-        try{
-            startDate = ft.parse(st); endDate = ft.parse(en);
+        try {
+            startDate = ft.parse(st);
+            endDate = ft.parse(en);
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        Ticket ticket = new Ticket(name, place, city,
-                startDate, endDate, cat);
+        Ticket ticket = new Ticket(name, place, city, startDate, endDate, cat);
         List<TicketProvider> tps = new ArrayList<>();
         if (emptyProvider) {
             ticket.setTicketProviders(tps);
             return ticket;
         }
-        TicketProvider tp =
-                new TicketProvider(providerRepository.findAll().get(0), ticket);
+        List<Provider> providers = providerRepository.findAll();
+        System.out.println("insert ticket with provider " + providers.get(0));
+        TicketProvider tp = new TicketProvider(providers.get(0), ticket);
         Section sec = new Section(new Date(), "A sample section");
-        TicketItem ticketItem = new TicketItem(new BigDecimal("100.00"), "A " +
-                "ticket");
+        TicketItem ticketItem = new TicketItem(new BigDecimal("100.00"), "A ticket");
+        ticketItem.setSection(sec);
         List<TicketItem> ticketItemList = new ArrayList<>();
         ticketItemList.add(ticketItem);
         sec.setTicketItemList(ticketItemList);
+        sec.setTicketProvider(tp);
         List<Section> sectionList = new ArrayList<>();
         sectionList.add(sec);
         tp.setSectionList(sectionList);
