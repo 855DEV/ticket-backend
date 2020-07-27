@@ -5,7 +5,9 @@ import app.ticket.dao.TicketDao;
 import app.ticket.entity.*;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -18,11 +20,14 @@ import java.util.stream.Collectors;
 
 @Service
 public class TicketServiceImpl implements TicketService {
-    @Autowired
-    private TicketDao ticketDao;
 
-    @Autowired
-    private ProviderDao providerDao;
+    private final TicketDao ticketDao;
+    private final ProviderDao providerDao;
+
+    public TicketServiceImpl(TicketDao ticketDao, ProviderDao providerDao) {
+        this.ticketDao = ticketDao;
+        this.providerDao = providerDao;
+    }
 
     @Override
     public List<Ticket> findAll() {
@@ -32,6 +37,12 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public Ticket findOne(Integer id) {
         return ticketDao.findOne(id);
+    }
+
+    @Override
+    public Page<Ticket> findByPage(int pageId, int size) {
+        Pageable page = PageRequest.of(pageId, size);
+        return ticketDao.findByPage(page);
     }
 
     @Override

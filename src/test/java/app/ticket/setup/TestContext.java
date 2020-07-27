@@ -12,6 +12,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
@@ -30,40 +31,45 @@ public class TestContext {
             return;
         }
         for (int i = 0; i < amount; i++) {
-            providerRepository.save(new Provider("Test Provider " + i, "www.test.com"));
+            Provider provider = providerRepository.save(new Provider("Test Provider " + i, "www.test.com"));
+            System.out.print(" id: " + provider.getId() + " ");
         }
     }
 
     /**
      * Create a simple Ticket object
      * The caller must prepare providers before calling the function.
+     *
      * @param providerRepository a provider repository with some initialized
      *                           provider
      * @return Created Ticket object
      */
-    public static Ticket createTicket(ProviderRepository providerRepository, String name, String place, String city, String st, String en, String cat, Boolean emptyProvider){
+    public static Ticket createTicket(ProviderRepository providerRepository, String name, String place, String city, String st, String en, String cat, Boolean emptyProvider) {
         SimpleDateFormat ft = new SimpleDateFormat("yyyyMMdd");
         Date startDate = new Date(), endDate = new Date();
-        try{
-            startDate = ft.parse(st); endDate = ft.parse(en);
+        try {
+            startDate = ft.parse(st);
+            endDate = ft.parse(en);
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        Ticket ticket = new Ticket(name, place, city,
-                startDate, endDate, cat);
+        Ticket ticket = new Ticket(name, place, city, startDate, endDate, cat);
         List<TicketProvider> tps = new ArrayList<>();
         if (emptyProvider) {
             ticket.setTicketProviders(tps);
             return ticket;
         }
-        TicketProvider tp =
-                new TicketProvider(providerRepository.findAll().get(0), ticket);
+        List<Provider> providers = providerRepository.findAll();
+        assertNotNull(providers.get(0));
+        System.out.println("insert ticket with provider " + providers.get(0));
+        TicketProvider tp = new TicketProvider(providers.get(0), ticket);
         Section sec = new Section(new Date(), "A sample section");
-        TicketItem ticketItem = new TicketItem(new BigDecimal("100.00"), "A " +
-                "ticket");
+        TicketItem ticketItem = new TicketItem(new BigDecimal("100.00"), "A ticket");
+        ticketItem.setSection(sec);
         List<TicketItem> ticketItemList = new ArrayList<>();
         ticketItemList.add(ticketItem);
         sec.setTicketItemList(ticketItemList);
+        sec.setTicketProvider(tp);
         List<Section> sectionList = new ArrayList<>();
         sectionList.add(sec);
         tp.setSectionList(sectionList);
@@ -71,6 +77,7 @@ public class TestContext {
         ticket.setTicketProviders(tps);
         return ticket;
     }
+
     public static Ticket createTicket(ProviderRepository providerRepository) {
         return TestContext.createTicket(providerRepository, "name", "place", "city", "19260817", "19890604", "mo", false);
     }
