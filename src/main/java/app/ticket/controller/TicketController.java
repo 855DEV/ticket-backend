@@ -41,7 +41,10 @@ public class TicketController {
         int total = ticketPage.getTotalPages();
         boolean next = ticketPage.hasNext();
         boolean last = ticketPage.isLast();
-        List<JSONObject> content = ticketList.parallelStream().map(this::wrapTicket).collect(Collectors.toList());
+        List<JSONObject> content = new ArrayList<>();
+        for (Ticket t: ticketList) {
+            content.add(wrapTicket(t));
+        }
         JSONObject data = new JSONObject();
         data.put("data", content);
         data.put("next", next);
@@ -83,13 +86,13 @@ public class TicketController {
         json.put("startDate", ticket.getStartDate());
         json.put("endDate", ticket.getEndDate());
         List<JSONObject> providersJson =
-                ticket.getTicketProviders().parallelStream()
+                ticket.getTicketProviders().stream()
                         .map((tp) -> {
                             JSONObject tpJson = new JSONObject();
                             tpJson.put("id", tp.getProvider().getId());
                             tpJson.put("name", tp.getProvider().getName());
                             List<JSONObject> sectionJson =
-                                    tp.getSectionList().parallelStream().map(this::wrapSection).collect(Collectors.toList());
+                                    tp.getSectionList().stream().map(this::wrapSection).collect(Collectors.toList());
                             JSONArray sections = new JSONArray();
                             sections.addAll(sectionJson);
                             tpJson.put("sections", sections);
@@ -108,7 +111,8 @@ public class TicketController {
         j.put("time", section.getTime());
         List<JSONObject> ticketItemList = new ArrayList<>();
         if (section.getTicketItemList() != null)
-            ticketItemList = section.getTicketItemList().parallelStream().map(this::wrapTicketItem).collect(Collectors.toList());
+            ticketItemList =
+                    section.getTicketItemList().stream().map(this::wrapTicketItem).collect(Collectors.toList());
         JSONArray ticketItems =
                 new JSONArray(Collections.singletonList(ticketItemList));
         j.put("items", ticketItems);

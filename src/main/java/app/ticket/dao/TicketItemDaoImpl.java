@@ -2,13 +2,16 @@ package app.ticket.dao;
 
 import app.ticket.entity.TicketItem;
 import app.ticket.repository.TicketItemRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class TicketItemDaoImpl implements TicketItemDao {
-    @Autowired
-    TicketItemRepository ticketItemRepository;
+
+    private final TicketItemRepository ticketItemRepository;
+
+    public TicketItemDaoImpl(TicketItemRepository ticketItemRepository) {
+        this.ticketItemRepository = ticketItemRepository;
+    }
 
     @Override
     public TicketItem getOne(Integer id) {

@@ -30,7 +30,9 @@ public class TicketDaoImpl implements TicketDao {
     // TODO: attach image and intro
     @Override
     public Page<Ticket> findByPage(Pageable page) {
-        return ticketRepository.findAll(page);
+        Page<Ticket> ticketPage = ticketRepository.findAll(page);
+        ticketPage.getContent().parallelStream().forEach(this::attachDetail);
+        return ticketPage;
     }
 
     @Override
@@ -51,6 +53,20 @@ public class TicketDaoImpl implements TicketDao {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    /**
+     * Attach detailed data, like image and introduction to `ticket`
+     * @param ticket target ticket
+     */
+    private void attachDetail(Ticket ticket) {
+        if(ticket == null) return;
+        TicketDetail detail =
+                ticketDetailRepository.findByTid(ticket.getId());
+        if(detail != null){
+            ticket.setImage(detail.getImg());
+            ticket.setIntro(detail.getIntro());
         }
     }
 
