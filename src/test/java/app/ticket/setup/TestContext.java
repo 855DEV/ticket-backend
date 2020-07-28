@@ -37,6 +37,36 @@ public class TestContext {
             providerRepository.save(new Provider("Test Provider " + i, "www.test.com"));
         }
     }
+    
+    /**
+     * Save x tickets of category "mo" and y tickets of category "ha"
+     */
+    public static void saveTickets(ProviderRepository providerRepository, TicketRepository ticketRepository, Integer x, Integer y){
+        for (int i = 1; i <= x; i++){
+            Ticket t = TestContext.createTicket(providerRepository, Integer.toString(i), "SJTU", "上海", "19890604", "20200718", "mo", false);
+            ticketRepository.save(t);
+        }
+        for (int i = 1; i <= y; i++){
+            Ticket t = TestContext.createTicket(providerRepository, Integer.toString(i + x), "SJTU", "上海", "19890604", "20200718", "ha", false);
+            ticketRepository.save(t);
+        }
+    }
+
+    /**
+     * create a JSONObject as requestbody in POST "/order"
+     */
+    public static JSONObject getOrderPOSTJSON(List<TicketItem> tl){
+        JSONArray items = new JSONArray();
+        for (TicketItem it : tl){
+            JSONObject itemJson = new JSONObject();
+            itemJson.put("ticketItemId", it.getId());
+            itemJson.put("amount", 1);
+            items.add(itemJson);
+        }
+        JSONObject postJson = new JSONObject();
+        postJson.put("items", items);
+        return postJson;
+    }
 
     /**
      * Create a simple Ticket object
