@@ -2,11 +2,11 @@ package app.ticket.setup;
 
 import app.ticket.entity.*;
 import app.ticket.repository.ProviderRepository;
+import app.ticket.repository.TicketRepository;
 import app.ticket.repository.UserRepository;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.assertj.core.internal.bytebuddy.utility.RandomString;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
@@ -24,7 +24,6 @@ public class TestContext {
     public static final String adminInitPassword = "init$pass";
     public static final String adminInitPasswordEncrypted = "$2a$10$dZ5AZRC.RtrRNswLTipOueIqZCLeCeEKMtPYTetTodelOwQ5m5Zou";
 
-    public static final String AUTH_STRING = "Authorization";
 
     public static void setUpProvider(ProviderRepository providerRepository,
                                      int amount) {
@@ -38,6 +37,32 @@ public class TestContext {
         }
     }
 
+    /**
+     * Save x tickets of category "mo" and y tickets of category "ha"
+     */
+    public static void saveTickets(ProviderRepository providerRepository, TicketRepository ticketRepository, Integer x, Integer y){
+        for (int i = 1; i <= x; i++){
+            Ticket t = TestContext.createTicket(providerRepository, Integer.toString(i), "SJTU", "上海", "19890604", "20200718", "mo", false);
+            ticketRepository.save(t);
+        }
+        for (int i = 1; i <= y; i++){
+            Ticket t = TestContext.createTicket(providerRepository, Integer.toString(i + x), "SJTU", "上海", "19890604", "20200718", "ha", false);
+            ticketRepository.save(t);
+        }
+    }
+
+    public static JSONObject getOrderPOSTJSON(List<TicketItem> tl){
+        JSONArray items = new JSONArray();
+        for (TicketItem it : tl){
+            JSONObject itemJson = new JSONObject();
+            itemJson.put("ticketItemId", it.getId());
+            itemJson.put("amount", 1);
+            items.add(itemJson);
+        }
+        JSONObject postJson = new JSONObject();
+        postJson.put("items", items);
+        return postJson;
+    }
     /**
      * Create a simple Ticket object
      * The caller must prepare providers before calling the function.
@@ -87,9 +112,9 @@ public class TestContext {
     /**
      * Register and return user with Authorization header.
      * The result map includes two entries:
-     * user: JSONString of registered user, with password encoded.
+     * user: JSONString of registered user, with password encoded
      * auth: Authorization token, can be put in request header to get
-     * authorization.
+     * authorization
      *
      * @param mockMvc MockMvc Object in context
      * @throws Exception some exception
@@ -148,45 +173,8 @@ public class TestContext {
                 .getResponse().getHeader("Authorization");
     }
 
-    /**
-     * Simply create a user and insert it into database.
-     * @param userRepository caller's user repository
-     * @return user inserted to database
-     */
-    public static Map<String, Object> createOneUser(UserRepository userRepository) {
+    public static User createOneUser(UserRepository userRepository) {
         User user = new User();
-        user.setUsername(RandomString.make());
-        String rawPassword = RandomString.make();
-        BCryptPasswordEncoder bCryptPasswordEncoder =
-                new BCryptPasswordEncoder();
-        String encrypted = bCryptPasswordEncoder.encode(rawPassword);
-        user.setPassword(encrypted);
-        User saved = userRepository.save(user);
-        Map<String, Object> data = new HashMap<>();
-        data.put("password", rawPassword);
-        data.put("user", saved);
-        return data;
-    }
-
-    /**
-     * Given a user, return its auth token.
-     * Note that the user should be newly created, and cannot be fetched from
-     * database because we have to know its raw password to perform oprations.
-     * @param mockMvc caller's MockMvc
-     * @param username username
-     * @param password password
-     * @return auth token string
-     * @throws Exception in mock MVC operations
-     */
-    public static String getUserAuth(MockMvc mockMvc, String username,
-                                     String password) throws Exception {
-        JSONObject loginJson = new JSONObject();
-        loginJson.put("username", username);
-        loginJson.put("password", password);
-        return mockMvc.perform(post("/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(loginJson.toJSONString()))
-                .andReturn()
-                .getResponse().getHeader("Authorization");
+        return userRepository.save(user);
     }
 }
