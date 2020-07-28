@@ -3,10 +3,7 @@ package app.ticket.controller;
 import app.ticket.entity.User;
 import app.ticket.service.OrdersService;
 import app.ticket.service.UserService;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,13 +20,17 @@ public class OrdersController {
     @GetMapping
     public Object getOrdersByUser() {
         User user = userService.getAuthedUser();
-        return user.getOrders();
+        //System.out.println("GET /orders " + user + "; " + user.getOrders().size());
+        //System.out.println("getOrders: " + ordersService.getUserOrders(user.getId()).size());
+        //return user.getOrders();
+        return ordersService.getUserOrders(user.getId());
     }
 
     @PostMapping
     public JSONObject createOrder(@RequestBody JSONObject info) {
         User user = userService.getAuthedUser();
         System.out.println("POST /orders" + user + " " + info);
+
         ordersService.addOne(user, info);
         return null;
     }

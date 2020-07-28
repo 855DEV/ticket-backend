@@ -12,7 +12,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
@@ -31,8 +30,7 @@ public class TestContext {
             return;
         }
         for (int i = 0; i < amount; i++) {
-            Provider provider = providerRepository.save(new Provider("Test Provider " + i, "www.test.com"));
-            System.out.print(" id: " + provider.getId() + " ");
+            providerRepository.save(new Provider("Test Provider " + i, "www.test.com"));
         }
     }
 
@@ -59,17 +57,14 @@ public class TestContext {
             ticket.setTicketProviders(tps);
             return ticket;
         }
-        List<Provider> providers = providerRepository.findAll();
-        assertNotNull(providers.get(0));
-        System.out.println("insert ticket with provider " + providers.get(0));
-        TicketProvider tp = new TicketProvider(providers.get(0), ticket);
+        TicketProvider tp =
+                new TicketProvider(providerRepository.findAll().get(0), ticket);
         Section sec = new Section(new Date(), "A sample section");
-        TicketItem ticketItem = new TicketItem(new BigDecimal("100.00"), "A ticket");
-        ticketItem.setSection(sec);
+        TicketItem ticketItem = new TicketItem(new BigDecimal("100.00"), "A " +
+                "ticket");
         List<TicketItem> ticketItemList = new ArrayList<>();
         ticketItemList.add(ticketItem);
         sec.setTicketItemList(ticketItemList);
-        sec.setTicketProvider(tp);
         List<Section> sectionList = new ArrayList<>();
         sectionList.add(sec);
         tp.setSectionList(sectionList);
