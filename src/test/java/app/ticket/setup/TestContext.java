@@ -84,9 +84,9 @@ public class TestContext {
     /**
      * Register and return user with Authorization header.
      * The result map includes two entries:
-     * user: JSONString of registered user, with password encoded
+     * user: JSONString of registered user, with password encoded.
      * auth: Authorization token, can be put in request header to get
-     * authorization
+     * authorization.
      *
      * @param mockMvc MockMvc Object in context
      * @throws Exception some exception

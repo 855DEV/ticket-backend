@@ -56,7 +56,7 @@ public class TicketControllerTest {
                 .webAppContextSetup(context)
                 .apply(springSecurity())
                 .build();
-        TestContext.setUpProvider(providerRepository, 20);
+        TestContext.setUpProvider(providerRepository, 10);
         TestContext.createGodAdmin(userRepository);
         authToken = TestContext.getGodAdminAuth(mockMvc);
         assertNotNull(authToken);
@@ -94,6 +94,19 @@ public class TicketControllerTest {
         JSONObject json = JSONObject.parseObject(str);
         assertTrue(json.getBooleanValue("last"));
         assertFalse(json.getBooleanValue("next"));
+    }
+
+    @Test
+    @DirtiesContext
+    public void findOne() throws Exception {
+        Ticket ticket = TestContext.createTicket(providerRepository);
+        ticket = ticketRepository.save(ticket);
+        assertNotNull(ticket);
+        assertNotNull(ticket.getId());
+        String res =
+                mockMvc.perform(get("/ticket/"+ticket.getId())).andReturn().getResponse().getContentAsString();
+        JSONObject json = JSONObject.parseObject(res);
+        assertEquals(ticket.getName(), json.getString("name"));
     }
 
     @Test
