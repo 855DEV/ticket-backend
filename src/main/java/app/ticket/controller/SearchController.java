@@ -126,14 +126,14 @@ public class SearchController {
         json.put("name", ticket.getName());
         json.put("startDate", ticket.getStartDate());
         json.put("endDate", ticket.getEndDate());
-        json.put("providers", ticket.getTicketProviders().parallelStream()
+        json.put("providers", ticket.getTicketProviders().stream()
                 .map((tp) -> {
                     JSONObject tpJson = new JSONObject();
                     tpJson.put("id", tp.getProvider().getId());
                     tpJson.put("name", tp.getProvider().getName());
                     if (tp.getSectionList() != null)
                         tpJson.put("sections",
-                                tp.getSectionList().parallelStream().map(this::wrapSection).collect(Collectors.toList()));
+                                tp.getSectionList().stream().map(this::wrapSection).collect(Collectors.toList()));
                     return tpJson;
                 }).collect(Collectors.toList()));
         return json;
