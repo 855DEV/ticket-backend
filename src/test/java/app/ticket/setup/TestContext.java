@@ -12,6 +12,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
@@ -57,14 +58,16 @@ public class TestContext {
             ticket.setTicketProviders(tps);
             return ticket;
         }
-        TicketProvider tp =
-                new TicketProvider(providerRepository.findAll().get(0), ticket);
+        List<Provider> providers = providerRepository.findAll();
+        assertNotNull(providers.get(0));
+        TicketProvider tp = new TicketProvider(providers.get(0), ticket);
         Section sec = new Section(new Date(), "A sample section");
-        TicketItem ticketItem = new TicketItem(new BigDecimal("100.00"), "A " +
-                "ticket");
+        TicketItem ticketItem = new TicketItem(new BigDecimal("100.00"), "A ticket");
+        ticketItem.setSection(sec);
         List<TicketItem> ticketItemList = new ArrayList<>();
         ticketItemList.add(ticketItem);
         sec.setTicketItemList(ticketItemList);
+        sec.setTicketProvider(tp);
         List<Section> sectionList = new ArrayList<>();
         sectionList.add(sec);
         tp.setSectionList(sectionList);
@@ -72,6 +75,7 @@ public class TestContext {
         ticket.setTicketProviders(tps);
         return ticket;
     }
+
 
     public static Ticket createTicket(ProviderRepository providerRepository) {
         return TestContext.createTicket(providerRepository, "name", "place", "city", "19260817", "19890604", "mo", false);
