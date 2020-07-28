@@ -2,6 +2,7 @@ package app.ticket.setup;
 
 import app.ticket.entity.*;
 import app.ticket.repository.*;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.assertj.core.internal.bytebuddy.utility.RandomString;
 import org.springframework.http.MediaType;
