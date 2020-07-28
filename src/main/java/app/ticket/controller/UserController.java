@@ -36,7 +36,7 @@ public class UserController {
             JSONObject m = new JSONObject();
             m.put("code", -1);
             m.put("message", "Username has been registered.");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(m.toJSONString());
+            return ResponseEntity.status(HttpStatus.OK).body(m.toJSONString());
         }
         User user = userService.insertOne(jsonObject);
         return ResponseEntity.ok(wrapUser(user).toJSONString());

@@ -42,16 +42,6 @@ public class OrdersServiceImpl implements OrdersService {
         Orders order = new Orders();
         JSONArray itemsJson = orderJSON.getJSONArray("items");
         BigDecimal price = new BigDecimal(0);
-        /*List<OrderItem> items = itemsJson.parallelStream().map((itemJson) -> {
-            Integer ticketItemId = ((JSONObject) itemJson).getInteger(
-                    "ticketItemId");
-            System.out.println("ID: " + ticketItemId);
-            Integer amount = ((JSONObject) itemJson).getInteger("amount");
-            System.out.println("amount: " + amount);
-            TicketItem ticketItem = ticketItemDao.getOne(ticketItemId);
-            System.out.println("Price: " + ticketItem.getPrice());
-            return new OrderItem(order, ticketItem, amount);
-        }).collect(Collectors.toList());*/
         List<OrderItem> items = new ArrayList<>();
         for (int i = 0; i < itemsJson.size(); i++){
             Integer id = itemsJson.getJSONObject(i).getInteger("ticketItemId");

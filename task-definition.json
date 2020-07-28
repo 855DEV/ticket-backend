@@ -57,7 +57,7 @@
     }
   ],
   "placementConstraints": [],
-  "memory": "512",
+  "memory": "1024",
   "taskRoleArn": null,
   "compatibilities": [
     "EC2",
@@ -108,7 +108,7 @@
     "FARGATE"
   ],
   "networkMode": "awsvpc",
-  "cpu": "256",
+  "cpu": "512",
   "revision": 1,
   "status": "ACTIVE",
   "inferenceAccelerators": null,

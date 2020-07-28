@@ -35,15 +35,22 @@ public class TicketServiceTest {
      */
     @BeforeEach
     public void setup() {
-        TestContext.setUpProvider(providerRepository, 20);
+        TestContext.setUpProvider(providerRepository, 10);
     }
 
     @Test
     @DirtiesContext
     public void findAll() {
-        List<Ticket> initList = ticketService.findAll();
-        assertNotNull(initList);
-        assertEquals(0, initList.size());
+        List<Ticket> list = ticketService.findAll();
+        assertNotNull(list);
+        assertEquals(0, list.size());
+        for (int i = 0; i < 23; i++) {
+            Ticket ticket = TestContext.createTicket(providerRepository);
+            ticketRepository.save(ticket);
+        }
+        list = ticketService.findAll();
+        assertNotNull(list);
+        assertEquals(23, list.size());
     }
 
     @Test
@@ -70,7 +77,7 @@ public class TicketServiceTest {
     }
 
     @Test
-    public void insertOneSimple() {
+    public void insertOne() {
         JSONObject ticketJson = new JSONObject();
         ticketJson.put("name", "Test Ticket Name");
         ticketJson.put("startDate", "2077-01-07");
@@ -80,11 +87,7 @@ public class TicketServiceTest {
         Ticket actual = ticketService.insertOne(ticketJson);
         assertNotNull(actual);
         assertEquals("Test Ticket Name", actual.getName());
-    }
 
-    @Test
-    @DirtiesContext
-    public void insertOneNormal() {
         String example = "{\n" +
                 "    \"name\": \"上海魔法世界\",\n" +
                 "    \"startDate\": \"2020-07-18 10:42:00\",\n" +
@@ -157,11 +160,17 @@ public class TicketServiceTest {
                 "        }\n" +
                 "    ]\n" +
                 "}";
-        JSONObject ticketJson = JSONObject.parseObject(example);
+        ticketJson = JSONObject.parseObject(example);
         assertNotNull(ticketJson, "JSON parsing failed.");
-        Ticket actual = ticketService.insertOne(ticketJson);
+        actual = ticketService.insertOne(ticketJson);
         assertNotNull(actual);
         assertEquals("上海魔法世界", actual.getName());
         assertEquals(2, actual.getTicketProviders().size());
+
+        Ticket ticket = TestContext.createTicket(providerRepository);
+        actual = ticketService.insertOne(ticket);
+        assertNotNull(actual);
+        assertEquals(ticket.getName(), actual.getName());
     }
+
 }
