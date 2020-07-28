@@ -28,7 +28,11 @@ public class RecommendController {
     public List<JSONObject> getRecommendList(@RequestParam(value="n",defaultValue="10") Integer n) {
         User user = userService.getAuthedUser();
         List<Ticket> ticketList = ticketService.findAll();
-        List<Orders> orderList = user.getOrders();
+        //System.out.println(user);
+        //System.out.println(ticketList);
+        //for (Ticket t : ticketList)
+        //    System.out.println(t);
+        List<Orders> orderList = ordersService.getUserOrders(user.getId());
 
         Map<String, List<Ticket>> ticketTable = new HashMap<>();
         Map<String, Integer> orderCnt = new HashMap<>();
@@ -56,10 +60,11 @@ public class RecommendController {
         Integer ticketSize = ticketList.size();
         Integer orderSize = 0;
         for (String key : orderCnt.keySet()){
-            if (user == null)
+            if (user == null || orderList.isEmpty())
                 orderCnt.put(key, 1);
             orderSize += orderCnt.get(key);
         }
+        System.out.println("orderCnt: " + orderCnt);
 
         List<Ticket> result = new ArrayList<>();
         Integer dif = 0;
@@ -76,12 +81,13 @@ public class RecommendController {
             if (g < f){
                 randomInt = randomNumberGenerator(g, g);
                 dif += (need - currentTicketSize) - g;
+                currentTicketSize += g;
             }
             else{
                 randomInt = randomNumberGenerator(g, f);
                 dif = 0;
+                currentTicketSize += f;
             }
-            currentTicketSize += g;
 
             List<Ticket> tmp = ticketTable.get(key);
             for (Integer i : randomInt)
@@ -114,14 +120,14 @@ public class RecommendController {
         json.put("name", ticket.getName());
         json.put("startDate", ticket.getStartDate());
         json.put("endDate", ticket.getEndDate());
-        json.put("providers", ticket.getTicketProviders().parallelStream()
+        json.put("providers", ticket.getTicketProviders().stream()
                 .map((tp) -> {
                     JSONObject tpJson = new JSONObject();
                     tpJson.put("id", tp.getProvider().getId());
                     tpJson.put("name", tp.getProvider().getName());
                     if (tp.getSectionList() != null)
                         tpJson.put("sections",
-                                tp.getSectionList().parallelStream().map(this::wrapSection).collect(Collectors.toList()));
+                                tp.getSectionList().stream().map(this::wrapSection).collect(Collectors.toList()));
                     return tpJson;
                 }).collect(Collectors.toList()));
         return json;
