@@ -33,7 +33,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 @SpringBootTest
 @Transactional
 @AutoConfigureMockMvc
-public class RecommendControllerTest {
+public class OrderControllerTest {
     @Autowired
     RecommendController recommendController;
 
@@ -72,24 +72,31 @@ public class RecommendControllerTest {
                 .apply(springSecurity())
                 .build();
         TestContext.setUpProvider(providerRepository, 20);
-        Ticket t1 = TestContext.createTicket(providerRepository, "魔法世界","上海交通大学","上海", "20200718", "20200729","mo", false);
-        Ticket t2 = TestContext.createTicket(providerRepository, "膜法世界","上交","下海", "20200703", "20200729", "mo", false);
-        Ticket t3 = TestContext.createTicket(providerRepository, "模法世界","交通大学","左海", "20200714", "20200729", "ha", false);
-        Ticket t4 = TestContext.createTicket(providerRepository, "莫法世界","蛤交大","上海", "20200716", "20200729", "ha", false);
-        ticketRepository.save(t1); ticketRepository.save(t2); ticketRepository.save(t3); ticketRepository.save(t4);
-
-        TestContext.saveTickets(providerRepository, ticketRepository, 0, 10);
-
+        TestContext.saveTickets(providerRepository, ticketRepository, 10, 10);
         Map<String, String> mm = TestContext.createUserAuth(mockMvc);
         authToken = mm.get("auth");
         System.out.println("Auth token: " + authToken);
+
     }
 
     @Test
-    public void getSearch() throws Exception{
-        System.out.println("Test 1:");
+    public void CreateOrder_and_getOrdersByUser() throws Exception{
+
         List<TicketItem> tl = ticketItemRepository.findAll();
-        JSONObject postJson = TestContext.getOrderPOSTJSON(tl);
+
+        JSONArray items = new JSONArray();
+        for (TicketItem it : tl){
+            JSONObject itemJson = new JSONObject();
+            itemJson.put("ticketItemId", it.getId());
+            itemJson.put("amount", 1);
+            items.add(itemJson);
+        }
+        System.out.println("items: " + items);
+        JSONObject postJson = new JSONObject();
+        postJson.put("items", items);
+
+        // Test: POST an order
+        System.out.println("POST an order");
         RequestBuilder authedRequest = post("/order")
                 .header("Authorization", authToken)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -97,16 +104,16 @@ public class RecommendControllerTest {
         String result = mockMvc.perform(authedRequest)
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
-        System.out.println("post response:" + result);
+        JSONObject res = JSONObject.parseObject(result);
+        System.out.println(result);
+        System.out.println("__________________OK____________________");
 
-        System.out.println("n = 5");
-        result = mockMvc.perform(get("/recommend?n=5").header("Authorization", authToken)).andExpect(status().isOk())
+
+        // Test: GET the order
+        System.out.println();
+        result = mockMvc.perform(get("/order").header("Authorization", authToken)).andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
         System.out.println(result);
-        JSONArray ja = (JSONArray) JSONObject.parse(result);
-        for (int i = 0; i < ja.size(); i++){
-            JSONObject json = ja.getJSONObject(i);
-            System.out.println(json.getString("name") + ";  ");
-        }
+        System.out.println("__________________OK____________________");
     }
 }
