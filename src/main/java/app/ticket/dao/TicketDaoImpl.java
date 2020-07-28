@@ -4,6 +4,8 @@ import app.ticket.entity.Ticket;
 import app.ticket.entity.TicketDetail;
 import app.ticket.repository.TicketDetailRepository;
 import app.ticket.repository.TicketRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -20,10 +22,17 @@ public class TicketDaoImpl implements TicketDao {
     }
 
     // TODO: attach image and intro to results
-    // TODO: Pageable query
     @Override
     public List<Ticket> findAll() {
         return ticketRepository.findAll();
+    }
+
+    // TODO: attach image and intro
+    @Override
+    public Page<Ticket> findByPage(Pageable page) {
+        Page<Ticket> ticketPage = ticketRepository.findAll(page);
+        ticketPage.getContent().parallelStream().forEach(this::attachDetail);
+        return ticketPage;
     }
 
     @Override
@@ -44,6 +53,20 @@ public class TicketDaoImpl implements TicketDao {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    /**
+     * Attach detailed data, like image and introduction to `ticket`
+     * @param ticket target ticket
+     */
+    private void attachDetail(Ticket ticket) {
+        if(ticket == null) return;
+        TicketDetail detail =
+                ticketDetailRepository.findByTid(ticket.getId());
+        if(detail != null){
+            ticket.setImage(detail.getImg());
+            ticket.setIntro(detail.getIntro());
         }
     }
 

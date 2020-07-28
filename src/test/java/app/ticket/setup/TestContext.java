@@ -1,7 +1,8 @@
 package app.ticket.setup;
 
 import app.ticket.entity.*;
-import app.ticket.repository.*;
+import app.ticket.repository.ProviderRepository;
+import app.ticket.repository.UserRepository;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -11,6 +12,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
@@ -36,11 +38,12 @@ public class TestContext {
     /**
      * Create a simple Ticket object
      * The caller must prepare providers before calling the function.
+     *
      * @param providerRepository a provider repository with some initialized
      *                           provider
      * @return Created Ticket object
      */
-    public static Ticket createTicket(ProviderRepository providerRepository, String name, String place, String city, String st, String en, String cat, Boolean emptyProvider){
+    public static Ticket createTicket(ProviderRepository providerRepository, String name, String place, String city, String st, String en, String cat, Boolean emptyProvider) {
         SimpleDateFormat ft = new SimpleDateFormat("yyyyMMdd");
         Date startDate = new Date(), endDate = new Date();
         try {
@@ -56,7 +59,7 @@ public class TestContext {
             return ticket;
         }
         List<Provider> providers = providerRepository.findAll();
-        System.out.println("insert ticket with provider " + providers.get(0));
+        assertNotNull(providers.get(0));
         TicketProvider tp = new TicketProvider(providers.get(0), ticket);
         Section sec = new Section(new Date(), "A sample section");
         TicketItem ticketItem = new TicketItem(new BigDecimal("100.00"), "A ticket");
@@ -72,6 +75,8 @@ public class TestContext {
         ticket.setTicketProviders(tps);
         return ticket;
     }
+
+
     public static Ticket createTicket(ProviderRepository providerRepository) {
         return TestContext.createTicket(providerRepository, "name", "place", "city", "19260817", "19890604", "mo", false);
     }

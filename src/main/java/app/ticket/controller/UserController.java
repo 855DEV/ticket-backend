@@ -1,15 +1,11 @@
 package app.ticket.controller;
 
 import app.ticket.entity.User;
-import app.ticket.repository.UserRepository;
 import app.ticket.service.UserService;
 import app.ticket.util.Message;
 import com.alibaba.fastjson.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,10 +18,14 @@ public class UserController {
     }
 
     @GetMapping
-    public User getUserInfo() {
+    public ResponseEntity<User> getUserInfo() {
         User user = userService.getAuthedUser();
+        if(user == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
         user.setPassword(""); // remove encrypted password from response
-        return user;
+        System.out.println(user);
+        return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
     @PostMapping("/register")

@@ -8,11 +8,13 @@ import app.ticket.service.TicketService;
 import app.ticket.service.UserService;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,9 +31,26 @@ public class TicketController {
     }
 
     @GetMapping
-    public List<JSONObject> findAll() {
-        System.out.println("GET /ticket");
-        return ticketService.findAll().parallelStream().map(this::wrapTicket).collect(Collectors.toList());
+    public JSONObject findAll(@RequestParam(name = "page", required = false) Integer page,
+                              @RequestParam(name = "size", required = false) Integer size) {
+        System.out.println("GET /ticket?page=" + page + "&size=" + size);
+        page = (page == null) ? 0 : page;
+        size = (size == null) ? 10 : size;
+        Page<Ticket> ticketPage = ticketService.findByPage(page, size);
+        List<Ticket> ticketList = ticketPage.getContent();
+        int total = ticketPage.getTotalPages();
+        boolean next = ticketPage.hasNext();
+        boolean last = ticketPage.isLast();
+        List<JSONObject> content = new ArrayList<>();
+        for (Ticket t: ticketList) {
+            content.add(wrapTicket(t));
+        }
+        JSONObject data = new JSONObject();
+        data.put("data", content);
+        data.put("next", next);
+        data.put("last", last);
+        data.put("total", total);
+        return data;
     }
 
     @GetMapping("/{id}")
@@ -67,18 +86,18 @@ public class TicketController {
         json.put("startDate", ticket.getStartDate());
         json.put("endDate", ticket.getEndDate());
         List<JSONObject> providersJson =
-                ticket.getTicketProviders().parallelStream()
-                .map((tp) -> {
-                    JSONObject tpJson = new JSONObject();
-                    tpJson.put("id", tp.getProvider().getId());
-                    tpJson.put("name", tp.getProvider().getName());
-                    List<JSONObject> sectionJson =
-                            tp.getSectionList().parallelStream().map(this::wrapSection).collect(Collectors.toList());
-                    JSONArray sections = new JSONArray();
-                    sections.addAll(sectionJson);
-                    tpJson.put("sections", sections);
-                    return tpJson;
-                }).collect(Collectors.toList());
+                ticket.getTicketProviders().stream()
+                        .map((tp) -> {
+                            JSONObject tpJson = new JSONObject();
+                            tpJson.put("id", tp.getProvider().getId());
+                            tpJson.put("name", tp.getProvider().getName());
+                            List<JSONObject> sectionJson =
+                                    tp.getSectionList().stream().map(this::wrapSection).collect(Collectors.toList());
+                            JSONArray sections = new JSONArray();
+                            sections.addAll(sectionJson);
+                            tpJson.put("sections", sections);
+                            return tpJson;
+                        }).collect(Collectors.toList());
         JSONArray providers = new JSONArray(Collections.singletonList(providersJson));
         json.put("providers", providers);
         json.put("image", ticket.getImage());
@@ -90,8 +109,10 @@ public class TicketController {
         JSONObject j = new JSONObject();
         j.put("description", section.getDescription());
         j.put("time", section.getTime());
-        List<JSONObject> ticketItemList =
-                section.getTicketItemList().parallelStream().map(this::wrapTicketItem).collect(Collectors.toList());
+        List<JSONObject> ticketItemList = new ArrayList<>();
+        if (section.getTicketItemList() != null)
+            ticketItemList =
+                    section.getTicketItemList().stream().map(this::wrapTicketItem).collect(Collectors.toList());
         JSONArray ticketItems =
                 new JSONArray(Collections.singletonList(ticketItemList));
         j.put("items", ticketItems);
@@ -101,7 +122,7 @@ public class TicketController {
     private JSONObject wrapTicketItem(TicketItem ticketItem) {
         JSONObject j = new JSONObject();
         j.put("price", ticketItem.getPrice());
-        j.put("description",ticketItem.getDescription());
+        j.put("description", ticketItem.getDescription());
         return j;
     }
 }

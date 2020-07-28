@@ -21,8 +21,8 @@ public class UserControllerTest {
 
     @Test
     void getOne() throws Exception {
-        // Test: User not exist
-        mockMvc.perform(get(api + "/1")).andExpect(status().is(403));
+        // Test: Not logged in
+        mockMvc.perform(get(api)).andExpect(status().is(403));
     }
 
     @Test

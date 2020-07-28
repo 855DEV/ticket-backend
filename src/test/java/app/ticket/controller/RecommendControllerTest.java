@@ -1,13 +1,10 @@
 package app.ticket.controller;
 
-import app.ticket.entity.OrderItem;
 import app.ticket.entity.Ticket;
 import app.ticket.entity.TicketItem;
-import app.ticket.entity.Orders;
 import app.ticket.repository.*;
 import app.ticket.service.UserService;
 import app.ticket.setup.TestContext;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
@@ -64,6 +61,7 @@ public class RecommendControllerTest {
     @Autowired
     private WebApplicationContext context;
 
+    @Autowired
     private MockMvc mockMvc;
 
     @BeforeEach
@@ -79,13 +77,13 @@ public class RecommendControllerTest {
         Ticket t4 = TestContext.createTicket(providerRepository, "莫法世界","蛤交大","上海", "20200716", "20200729", "ha", false);
         ticketRepository.save(t1); ticketRepository.save(t2); ticketRepository.save(t3); ticketRepository.save(t4);
 
-        Ticket tickets[] = new Ticket[20];
-        for (Integer i = 1; i <= 10; i++){
-            Ticket t = TestContext.createTicket(providerRepository, i.toString(), "SJTU", "上海", "19890604", "20200718", "mo", false);
+        Ticket[] tickets = new Ticket[20];
+        for (int i = 1; i <= 10; i++){
+            Ticket t = TestContext.createTicket(providerRepository, Integer.toString(i), "SJTU", "上海", "19890604", "20200718", "mo", false);
             ticketRepository.save(t);
             tickets[i - 1] = t;
-            Integer j = i + 10;
-            t = TestContext.createTicket(providerRepository, j.toString(), "SJTU", "上海", "19890604", "20200718", "ha", false);
+            int j = i + 10;
+            t = TestContext.createTicket(providerRepository, Integer.toString(j), "SJTU", "上海", "19890604", "20200718", "ha", false);
             ticketRepository.save(t);
             tickets[i + 10 - 1] = t;
         }
@@ -129,7 +127,7 @@ public class RecommendControllerTest {
     }
 
     @Test
-    public void getSearch() throws Exception {
+    public void getSearch() {
         System.out.println("----------------- recommend test begin-----------------");
 
     }

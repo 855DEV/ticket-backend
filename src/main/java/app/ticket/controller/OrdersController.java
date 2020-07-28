@@ -3,13 +3,8 @@ package app.ticket.controller;
 import app.ticket.entity.User;
 import app.ticket.service.OrdersService;
 import app.ticket.service.UserService;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
 
 @RestController
 @RequestMapping("/order")
