@@ -14,7 +14,10 @@
 
 name: Build and Deploy to Google Compute Engine
 
-on: push
+on:
+  push:
+    - master
+    - dev
 
 env:
   PROJECT_ID: ${{ secrets.GCE_PROJECT }}
@@ -55,7 +58,12 @@ jobs:
       # Build the Docker image
       - name: Build
         run: |-
-          docker build --tag "gcr.io/$PROJECT_ID/$GCE_INSTANCE-image:$GITHUB_SHA" --build-arg MYSQL_URL='${{ secrets.MYSQL_URL }}'  --build-arg MYSQL_USERNAME='${{ secrets.MYSQL_USERNAME }}' --build-arg MYSQL_PASSWORD='${{ secrets.MYSQL_PASSWORD }}' --build-arg MONGO_URL='${{ secrets.MONGO_URL }}' .
+          docker build --tag "gcr.io/$PROJECT_ID/$GCE_INSTANCE-image:$GITHUB_SHA"
+            --build-arg MYSQL_URL='${{ secrets.MYSQL_URL }}' \
+            --build-arg MYSQL_USERNAME='${{ secrets.MYSQL_USERNAME }}' \
+            --build-arg MYSQL_PASSWORD='${{ secrets.MYSQL_PASSWORD }}' \
+            --build-arg MONGO_URL='${{ secrets.MONGO_URL }}' \
+            .
       # Push the Docker image to Google Container Registry
       - name: Publish
         run: |-
