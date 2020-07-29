@@ -1,7 +1,7 @@
 # Ticket App Backend
 
 ![Tests](https://github.com/855DEV/ticket-backend/workflows/Tests/badge.svg)
-![Deploy](https://github.com/855DEV/ticket-backend/workflows/Deploy%20to%20Amazon%20ECS/badge.svg)
+![Build and Deploy to Google Compute Engine](https://github.com/855DEV/ticket-backend/workflows/Build%20and%20Deploy%20to%20Google%20Compute%20Engine/badge.svg)
 
 ## Configuration
 
