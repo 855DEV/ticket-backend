@@ -59,7 +59,7 @@ jobs:
       # Build the Docker image
       - name: Build
         run: |-
-          docker build --tag "gcr.io/$PROJECT_ID/$GCE_INSTANCE-image:$GITHUB_SHA"
+          docker build --tag "gcr.io/$PROJECT_ID/$GCE_INSTANCE-image:$GITHUB_SHA" \
             --build-arg MYSQL_URL='${{ secrets.MYSQL_URL }}' \
             --build-arg MYSQL_USERNAME='${{ secrets.MYSQL_USERNAME }}' \
             --build-arg MYSQL_PASSWORD='${{ secrets.MYSQL_PASSWORD }}' \
