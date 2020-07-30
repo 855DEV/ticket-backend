@@ -5,6 +5,8 @@ import app.ticket.dao.TicketDao;
 import app.ticket.entity.*;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@CacheConfig(cacheNames = {"lastResult"})
 public class TicketServiceImpl implements TicketService {
 
     private final TicketDao ticketDao;
@@ -30,22 +33,26 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
+    @Cacheable
     public List<Ticket> findAll() {
         return ticketDao.findAll();
     }
 
     @Override
+    @Cacheable
     public Ticket findOne(Integer id) {
         return ticketDao.findOne(id);
     }
 
     @Override
+    @Cacheable
     public Page<Ticket> findByPage(int pageId, int size) {
         Pageable page = PageRequest.of(pageId, size);
         return ticketDao.findByPage(page);
     }
 
     @Override
+    @Cacheable
     public Ticket insertOne(JSONObject ticketJson) {
         Ticket ticket = new Ticket();
         String name = ticketJson.getString("name");
@@ -62,6 +69,7 @@ public class TicketServiceImpl implements TicketService {
         }
         String place = ticketJson.getString("place");
         String city = ticketJson.getString("city");
+        String category = ticketJson.getString("category");
         JSONArray providers = ticketJson.getJSONArray("providers");
         // iterate through all providers
         List<TicketProvider> ticketProviderList = (providers == null) ?
@@ -89,6 +97,7 @@ public class TicketServiceImpl implements TicketService {
         ticket.setEndDate(endDate);
         ticket.setPlace(place);
         ticket.setCity(city);
+        ticket.setCategory(category);
         ticket.setTicketProviders(ticketProviderList);
         return ticketDao.insertOne(ticket);
     }

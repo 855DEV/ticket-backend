@@ -5,7 +5,10 @@ import app.ticket.service.OrdersService;
 import app.ticket.service.UserService;
 import app.ticket.service.TicketService;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -13,6 +16,7 @@ import java.util.stream.*;
 
 @RestController
 @RequestMapping("/recommend")
+@CacheConfig(cacheNames = {"lastResult"})
 public class RecommendController {
     private final UserService userService;
     private final TicketService ticketService;
@@ -102,6 +106,7 @@ public class RecommendController {
         return ret;
     }
 
+    @Cacheable
     private JSONObject wrapTicket(Ticket ticket) {
         if (ticket == null) return null;
         JSONObject json = new JSONObject();
@@ -109,16 +114,23 @@ public class RecommendController {
         json.put("name", ticket.getName());
         json.put("startDate", ticket.getStartDate());
         json.put("endDate", ticket.getEndDate());
-        json.put("providers", ticket.getTicketProviders().stream()
-                .map((tp) -> {
-                    JSONObject tpJson = new JSONObject();
-                    tpJson.put("id", tp.getProvider().getId());
-                    tpJson.put("name", tp.getProvider().getName());
-                    if (tp.getSectionList() != null)
-                        tpJson.put("sections",
-                                tp.getSectionList().stream().map(this::wrapSection).collect(Collectors.toList()));
-                    return tpJson;
-                }).collect(Collectors.toList()));
+        List<JSONObject> providersJson =
+                ticket.getTicketProviders().stream()
+                        .map((tp) -> {
+                            JSONObject tpJson = new JSONObject();
+                            tpJson.put("id", tp.getProvider().getId());
+                            tpJson.put("name", tp.getProvider().getName());
+                            List<JSONObject> sectionJson =
+                                    tp.getSectionList().stream().map(this::wrapSection).collect(Collectors.toList());
+                            JSONArray sections = new JSONArray();
+                            sections.addAll(sectionJson);
+                            tpJson.put("sections", sections);
+                            return tpJson;
+                        }).collect(Collectors.toList());
+        JSONArray providers = new JSONArray(Collections.singletonList(providersJson));
+        json.put("providers", providers);
+        json.put("image", ticket.getImage());
+        json.put("intro", ticket.getIntro());
         return json;
     }
 
@@ -126,7 +138,20 @@ public class RecommendController {
         JSONObject j = new JSONObject();
         j.put("description", section.getDescription());
         j.put("time", section.getTime());
-        j.put("items", section.getTicketItemList());
+        List<JSONObject> ticketItemList = new ArrayList<>();
+        if (section.getTicketItemList() != null)
+            ticketItemList =
+                    section.getTicketItemList().stream().map(this::wrapTicketItem).collect(Collectors.toList());
+        JSONArray ticketItems =
+                new JSONArray(Collections.singletonList(ticketItemList));
+        j.put("items", ticketItems);
+        return j;
+    }
+
+    private JSONObject wrapTicketItem(TicketItem ticketItem) {
+        JSONObject j = new JSONObject();
+        j.put("price", ticketItem.getPrice());
+        j.put("description", ticketItem.getDescription());
         return j;
     }
 
