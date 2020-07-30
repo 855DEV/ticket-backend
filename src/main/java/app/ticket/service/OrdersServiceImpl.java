@@ -9,6 +9,8 @@ import app.ticket.entity.TicketItem;
 import app.ticket.entity.User;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -19,6 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@CacheConfig(cacheNames = {"lastResult"})
 public class OrdersServiceImpl implements OrdersService {
 
     private final OrdersDao ordersDao;
@@ -30,6 +33,7 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     @Override
+    @Cacheable
     public List<Orders> getUserOrders(Integer userId) {
         User user = new User();
         user.setId(userId);
