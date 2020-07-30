@@ -10,6 +10,7 @@ import com.alibaba.fastjson.JSON;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,20 +51,18 @@ public class SearchController {
         }
     }
 
-    @GetMapping
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Cacheable
-    public ResponseEntity<String> getSearch(@RequestParam(value = "s") String text,
-                                            @RequestParam(value = "city", defaultValue = "") String city,
-                                            @RequestParam(value = "cat", defaultValue = "") String category,
-                                            @RequestParam(value = "st", defaultValue = "") String startDate,
-                                            @RequestParam(value = "en", defaultValue = "") String endDate,
-                                            @RequestParam(value = "o", defaultValue = "2") Integer orderChosen) {
+    public ResponseEntity<JSONArray> getSearch( @RequestParam(value = "s") String text,
+                                                @RequestParam(value = "city", defaultValue = "") String city,
+                                                @RequestParam(value = "cat", defaultValue = "") String category,
+                                                @RequestParam(value = "st", defaultValue = "") String startDate,
+                                                @RequestParam(value = "en", defaultValue = "") String endDate,
+                                                @RequestParam(value = "o", defaultValue = "2") Integer orderChosen) {
         System.out.println("Search : " + text);
         if (orderChosen < 1 || orderChosen > 3){
             JSONObject res = new JSONObject();
-            res.put("code", -1);
-            res.put("message", "Bad Request");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res.toJSONString());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new JSONArray());
         }
 
         List<Ticket> ticketList = ticketService.findAll();
@@ -137,10 +136,10 @@ public class SearchController {
         else if (orderChosen == 3)
             Collections.sort(res, new SortByStartDate());
 
-        List<JSONObject> j = new ArrayList<>();
+        JSONArray j = new JSONArray();
         for (myClass r : res)
             j.add(wrapTicket(r.t));
-        return ResponseEntity.ok(JSON.toJSONString(j));
+        return ResponseEntity.ok(j);
     }
 
     @Cacheable
