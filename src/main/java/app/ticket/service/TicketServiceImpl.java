@@ -50,14 +50,15 @@ public class TicketServiceImpl implements TicketService {
         Ticket ticket = new Ticket();
         String name = ticketJson.getString("name");
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        Date startDate = null;
-        Date endDate = null;
+        Date startDate;
+        Date endDate;
         try {
             startDate = format.parse(ticketJson.getString("startDate"));
             endDate = format.parse(ticketJson.getString("endDate"));
         } catch (ParseException e) {
             e.printStackTrace();
             System.err.println("ERROR: Failed to parse date string");
+            return null;
         }
         String place = ticketJson.getString("place");
         String city = ticketJson.getString("city");

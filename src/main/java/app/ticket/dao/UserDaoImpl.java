@@ -12,6 +12,11 @@ public class UserDaoImpl implements UserDao {
     private UserRepository userRepository;
 
     @Override
+    public User findOne(Integer id) {
+        return userRepository.getOne(id);
+    }
+
+    @Override
     public User findUserByUsername(String username) {
         return userRepository.findByUsername(username);
     }
@@ -24,6 +29,11 @@ public class UserDaoImpl implements UserDao {
             e.printStackTrace();
             return null;
         }
+    }
+
+    @Override
+    public User updateOne(User user) {
+        return userRepository.save(user);
     }
 
     @Override

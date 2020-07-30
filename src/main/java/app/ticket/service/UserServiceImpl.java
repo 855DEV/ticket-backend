@@ -51,6 +51,36 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User updateOne(JSONObject userJson) {
+        Integer id = userJson.getInteger("id");
+        User user = userDao.findOne(id);
+        if(user == null)
+            return null;
+       userJson.keySet().forEach(keyStr -> {
+           String val = userJson.getString(keyStr);
+           switch (keyStr) {
+               case "nickname":
+                   user.setNickname(val);
+                   break;
+               case "username":
+                   user.setUsername(val);
+                   break;
+               case "email":
+                   user.setEmail(val);
+                   break;
+               case "phone":
+                   user.setPhone(val);
+                   break;
+               case "password":
+                   user.setPassword(bCryptPasswordEncoder.encode(val));
+               default:
+                   break;
+           }
+       });
+        return userDao.updateOne(user);
+    }
+
+    @Override
     public boolean deleteOne(Integer userId) {
         try {
             userDao.deleteOne(userId);

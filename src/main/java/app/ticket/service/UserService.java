@@ -10,6 +10,8 @@ public interface UserService {
 
     User insertOne(User user);
 
+    User updateOne(JSONObject userJson);
+
     boolean deleteOne(Integer userId);
 
     /**

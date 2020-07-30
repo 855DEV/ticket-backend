@@ -104,7 +104,7 @@ public class TicketControllerTest {
         assertNotNull(ticket);
         assertNotNull(ticket.getId());
         String res =
-                mockMvc.perform(get("/ticket/"+ticket.getId())).andReturn().getResponse().getContentAsString();
+                mockMvc.perform(get("/ticket/" + ticket.getId())).andReturn().getResponse().getContentAsString();
         JSONObject json = JSONObject.parseObject(res);
         assertEquals(ticket.getName(), json.getString("name"));
     }
@@ -204,5 +204,15 @@ public class TicketControllerTest {
         JSONObject res = JSONObject.parseObject(result);
         System.out.println(res);
         assertEquals("上海魔法世界", res.getString("name"));
+
+        // bad date format
+        String exampleBad = "{\n" +
+                "    \"startDate\": \"12\"\n" +
+                "}";
+        RequestBuilder badReq = post("/ticket")
+                .header("Authorization", authToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(exampleBad);
+        mockMvc.perform(badReq).andExpect(status().is4xxClientError());
     }
 }
