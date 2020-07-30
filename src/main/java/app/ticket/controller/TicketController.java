@@ -71,10 +71,6 @@ public class TicketController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res.toJSONString());
         }
         Ticket ticket = ticketService.insertOne(ticketJson);
-        if(ticket == null) {
-            // insertion failed
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
-        }
         System.out.println("insert successfully:");
         System.out.println(ticket);
         JSONObject wrappedTicket = wrapTicket(ticket);

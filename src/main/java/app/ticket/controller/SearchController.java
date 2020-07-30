@@ -2,9 +2,13 @@ package app.ticket.controller;
 
 import app.ticket.entity.Section;
 import app.ticket.entity.Ticket;
+import app.ticket.entity.TicketItem;
 import app.ticket.service.TicketService;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSON;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +20,7 @@ import java.text.SimpleDateFormat;
 
 @RestController
 @RequestMapping("/search")
+@CacheConfig(cacheNames = {"lastResult"})
 public class SearchController {
     private final TicketService ticketService;
 
@@ -46,6 +51,7 @@ public class SearchController {
     }
 
     @GetMapping
+    @Cacheable
     public ResponseEntity<String> getSearch(@RequestParam(value = "s") String text,
                                             @RequestParam(value = "city", defaultValue = "") String city,
                                             @RequestParam(value = "cat", defaultValue = "") String category,
@@ -96,12 +102,30 @@ public class SearchController {
             }
 
             Integer cnt = 0;
-            //System.out.println("Parse " + t.getName() + ": ");
+            //System.out.println("Parse " + t + ": ");
             for (String s : sText){
-                if (s.length() == 0) continue;
-                //System.out.println("word " + s + ": " + t.getCategory().contains(s));
-                if (t.getName().contains(s) || t.getPlace().contains(s) || t.getCategory().contains(s) || t.getCity().contains(s))
+                if (s.isBlank()) continue;
+                if (t.getName() != null &&t.getName().contains(s)){
                     cnt++;
+                    continue;
+                }
+                //System.out.println("case 2");
+                if (t.getPlace() != null &&t.getPlace().contains(s)){
+                    cnt++;
+                    continue;
+                }
+                //System.out.println("case 3");
+                System.out.println(t.getCategory());
+                if (t.getCategory() != null &&t.getCategory().contains(s)){
+                    cnt++;
+                    continue;
+                }
+                //System.out.println("case 4");
+                if (t.getCity() != null&&t.getCity().contains(s)){
+                    cnt++;
+                    continue;
+                }
+                //System.out.println("case 5");
             }
             //System.out.println("res = " + cnt);
             if (cnt == 0) continue;
@@ -119,6 +143,7 @@ public class SearchController {
         return ResponseEntity.ok(JSON.toJSONString(j));
     }
 
+    @Cacheable
     private JSONObject wrapTicket(Ticket ticket) {
         if (ticket == null) return null;
         JSONObject json = new JSONObject();
@@ -126,16 +151,23 @@ public class SearchController {
         json.put("name", ticket.getName());
         json.put("startDate", ticket.getStartDate());
         json.put("endDate", ticket.getEndDate());
-        json.put("providers", ticket.getTicketProviders().stream()
-                .map((tp) -> {
-                    JSONObject tpJson = new JSONObject();
-                    tpJson.put("id", tp.getProvider().getId());
-                    tpJson.put("name", tp.getProvider().getName());
-                    if (tp.getSectionList() != null)
-                        tpJson.put("sections",
-                                tp.getSectionList().stream().map(this::wrapSection).collect(Collectors.toList()));
-                    return tpJson;
-                }).collect(Collectors.toList()));
+        List<JSONObject> providersJson =
+                ticket.getTicketProviders().stream()
+                        .map((tp) -> {
+                            JSONObject tpJson = new JSONObject();
+                            tpJson.put("id", tp.getProvider().getId());
+                            tpJson.put("name", tp.getProvider().getName());
+                            List<JSONObject> sectionJson =
+                                    tp.getSectionList().stream().map(this::wrapSection).collect(Collectors.toList());
+                            JSONArray sections = new JSONArray();
+                            sections.addAll(sectionJson);
+                            tpJson.put("sections", sections);
+                            return tpJson;
+                        }).collect(Collectors.toList());
+        JSONArray providers = new JSONArray(Collections.singletonList(providersJson));
+        json.put("providers", providers);
+        json.put("image", ticket.getImage());
+        json.put("intro", ticket.getIntro());
         return json;
     }
 
@@ -143,7 +175,20 @@ public class SearchController {
         JSONObject j = new JSONObject();
         j.put("description", section.getDescription());
         j.put("time", section.getTime());
-        j.put("items", section.getTicketItemList());
+        List<JSONObject> ticketItemList = new ArrayList<>();
+        if (section.getTicketItemList() != null)
+            ticketItemList =
+                    section.getTicketItemList().stream().map(this::wrapTicketItem).collect(Collectors.toList());
+        JSONArray ticketItems =
+                new JSONArray(Collections.singletonList(ticketItemList));
+        j.put("items", ticketItems);
+        return j;
+    }
+
+    private JSONObject wrapTicketItem(TicketItem ticketItem) {
+        JSONObject j = new JSONObject();
+        j.put("price", ticketItem.getPrice());
+        j.put("description", ticketItem.getDescription());
         return j;
     }
 }
