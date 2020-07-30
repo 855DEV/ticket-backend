@@ -74,6 +74,13 @@ public class UserControllerTest {
         JSONObject resJson = JSON.parseObject(res);
         assertNotNull(resJson);
         assertEquals(-1, resJson.getInteger("code"));
+        // a non-admin user try to delete another user
+        json.put("id", 38324);
+        res = mockMvc.perform(delete(api).header(TestContext.AUTH_STRING,
+                auth).content(json.toJSONString()).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        resJson = JSON.parseObject(res);
+        assertEquals(-1, resJson.getInteger("code"));
         // deletion issued by admin
         TestContext.createGodAdmin(userRepository);
         String adminToken = TestContext.getGodAdminAuth(mockMvc);

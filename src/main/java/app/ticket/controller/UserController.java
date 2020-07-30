@@ -20,7 +20,7 @@ public class UserController {
     @GetMapping
     public ResponseEntity<User> getUserInfo() {
         User user = userService.getAuthedUser();
-        if(user == null) {
+        if (user == null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
         user.setPassword(""); // remove encrypted password from response
@@ -40,6 +40,19 @@ public class UserController {
         }
         User user = userService.insertOne(jsonObject);
         return ResponseEntity.ok(wrapUser(user).toJSONString());
+    }
+
+    @PutMapping
+    public ResponseEntity<JSONObject> updateUserInfo(@RequestBody JSONObject jsonObject) {
+        Integer id = jsonObject.getInteger("id");
+        User user = userService.getAuthedUser();
+        if (id == null && user != null) {
+            id = user.getId();
+            jsonObject.put("id", id);
+        }
+        if (canDo(id)) {
+            return ResponseEntity.status(HttpStatus.OK).body(wrapUser(userService.updateOne(jsonObject)));
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     @DeleteMapping
@@ -68,8 +81,19 @@ public class UserController {
         j.put("phone", user.getPhone());
         j.put("address", user.getAddress());
         j.put("username", user.getUsername());
-        j.put("password", user.getPassword());
         j.put("blocked", user.getBlocked());
         return j;
+    }
+
+    /**
+     * Given id, check whether the authed user has permission to operate
+     *
+     * @param id the id of operation target
+     * @return whether the request can perform the operation
+     */
+    private boolean canDo(Integer id) {
+        User user = userService.getAuthedUser();
+        Integer ADMIN_TYPE = 0;
+        return user != null && (user.getType().equals(ADMIN_TYPE) || user.getId().equals(id));
     }
 }
