@@ -42,6 +42,8 @@ public class TicketDaoImpl implements TicketDao {
         if(detail != null){
             ticket.setImage(detail.getImg());
             ticket.setIntro(detail.getIntro());
+        } else {
+            System.err.println("Ticket " + id + " detail is null");
         }
         return ticket;
     }
