@@ -12,6 +12,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -89,10 +90,11 @@ public class SearchController {
 
         List<myClass> res = new ArrayList<>();
         for (Ticket t : ticketList){
-            if (!city.isBlank() && !t.getCity().equals(city)) continue;
-            if (!category.isBlank() && !t.getCategory().equals(category)) continue;
+            if (!city.isBlank() && (StringUtils.isEmpty(t.getCity()) || !t.getCity().equals(city))) continue;
+            if (!category.isBlank() && (StringUtils.isEmpty(t.getCategory()) || !t.getCategory().equals(category))) continue;
             if (!startDate.isBlank() && !endDate.isBlank()){
                 Date tst = t.getStartDate(), ten = t.getEndDate();
+                if (tst == null || ten == null) continue;
                 if (!((tst.compareTo(st) >= 0 && tst.compareTo(en) <= 0) ||
                       (ten.compareTo(st) >= 0 && ten.compareTo(en) <= 0) ||
                       (st.compareTo(tst) >= 0 && st.compareTo(ten) <= 0) ||
