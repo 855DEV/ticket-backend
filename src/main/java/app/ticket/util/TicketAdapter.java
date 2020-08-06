@@ -35,7 +35,8 @@ public class TicketAdapter {
                             tpJson.put("sections", sections);
                             return tpJson;
                         }).collect(Collectors.toList());
-        JSONArray providers = new JSONArray(Collections.singletonList(providersJson));
+        JSONArray providers = new JSONArray();
+        providers.addAll(providersJson);
         json.put("providers", providers);
         json.put("image", ticket.getImage());
         json.put("intro", ticket.getIntro());
@@ -51,7 +52,8 @@ public class TicketAdapter {
             ticketItemList =
                     section.getTicketItemList().stream().map(TicketAdapter::wrapTicketItem).collect(Collectors.toList());
         JSONArray ticketItems =
-                new JSONArray(Collections.singletonList(ticketItemList));
+                new JSONArray();
+        ticketItems.addAll(ticketItemList);
         j.put("items", ticketItems);
         return j;
     }

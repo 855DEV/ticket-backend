@@ -21,13 +21,13 @@ public class TicketDaoImpl implements TicketDao {
         this.ticketDetailRepository = ticketDetailRepository;
     }
 
-    // TODO: attach image and intro to results
     @Override
     public List<Ticket> findAll() {
-        return ticketRepository.findAll();
+        List<Ticket> tickets = ticketRepository.findAll();
+        tickets.forEach(this::attachDetail);
+        return tickets;
     }
 
-    // TODO: attach image and intro
     @Override
     public Page<Ticket> findByPage(Pageable page) {
         Page<Ticket> ticketPage = ticketRepository.findAll(page);
