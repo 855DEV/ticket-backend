@@ -37,7 +37,7 @@ public class TestContext {
             providerRepository.save(new Provider("Test Provider " + i, "www.test.com"));
         }
     }
-    
+
     /**
      * Save x tickets of category "mo" and y tickets of category "ha"
      */
@@ -181,7 +181,8 @@ public class TestContext {
     /**
      * Simply create a user and insert it into database.
      * @param userRepository caller's user repository
-     * @return user inserted to database
+     * @return user inserted to database. Available entries are User user,
+     * String rawPassword
      */
     public static Map<String, Object> createOneUser(UserRepository userRepository) {
         User user = new User();
