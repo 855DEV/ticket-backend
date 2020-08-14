@@ -85,7 +85,7 @@ public class UserControllerTest {
         TestContext.createGodAdmin(userRepository);
         String adminToken = TestContext.getGodAdminAuth(mockMvc);
         assertNotNull(adminToken);
-        user = (User)TestContext.createOneUser(userRepository).get("user");
+        user = (User) TestContext.createOneUser(userRepository).get("user");
         assertNotNull(user.getId());
         json = new JSONObject();
         json.put("id", 518);
@@ -102,7 +102,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void register() throws Exception{
+    public void register() throws Exception {
         // Register a new user
         String jsonString = "{\n" +
                 "    \"username\": \"Kirk\",\n" +
@@ -113,8 +113,8 @@ public class UserControllerTest {
                 "    \"address\": \"火星\"\n" +
                 "}";
         mockMvc.perform(post(api + "/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonString))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonString))
                 .andExpect(status().isOk());
         // username occupied
         String res = mockMvc.perform(post(api + "/register")
@@ -127,4 +127,35 @@ public class UserControllerTest {
         assertEquals(-1, json.getInteger("code"));
     }
 
+    @Test
+    public void updateUserInfo() throws Exception {
+        Map<String, Object> userInfo = TestContext.createOneUser(userRepository);
+        User user = (User) userInfo.get("user");
+        String password = (String)  userInfo.get("password");
+        assertNotNull(user);
+        // normal operation
+        JSONObject reqJson = new JSONObject();
+        reqJson.put("id", user.getId());
+        reqJson.put("username", "JeanValjean");
+        String auth = TestContext.getUserAuth(mockMvc, user.getUsername(),
+                password);
+        assertNotNull(auth);
+        assertNotEquals("", auth);
+        mockMvc.perform(put(api).header(TestContext.AUTH_STRING, auth).contentType(MediaType.APPLICATION_JSON).content(reqJson.toJSONString()))
+                .andExpect(status().isOk());
+        User updatedUser = userRepository.getOne(user.getId());
+        assertEquals("JeanValjean", updatedUser.getUsername());
+        // update oneself, without specifying one's own id in request JSON
+        auth = TestContext.getUserAuth(mockMvc, updatedUser.getUsername(),
+                password);
+        reqJson.clear();
+        reqJson.put("username", "Plato");
+        mockMvc.perform(put(api).header(TestContext.AUTH_STRING, auth).contentType(MediaType.APPLICATION_JSON).content(reqJson.toJSONString()))
+                .andExpect(status().isOk());
+        updatedUser = userRepository.getOne(user.getId());
+        assertEquals("Plato", updatedUser.getUsername());
+        // unauthorized request
+        mockMvc.perform(put(api).content(reqJson.toJSONString()).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
+    }
 }

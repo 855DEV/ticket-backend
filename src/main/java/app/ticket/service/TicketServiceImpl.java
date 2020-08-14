@@ -74,16 +74,16 @@ public class TicketServiceImpl implements TicketService {
         // iterate through all providers
         List<TicketProvider> ticketProviderList = (providers == null) ?
                 new ArrayList<>() :
-                providers.parallelStream()
+                providers.toJavaList(JSONObject.class).stream()
                         .map((p) -> {
-                            JSONObject jsonProvider = (JSONObject) p;
-                            Integer id = jsonProvider.getInteger("id");
-                            JSONArray sections = jsonProvider.getJSONArray("sections");
+                            Integer id = p.getInteger("id");
+                            JSONArray sections = p.getJSONArray("sections");
                             TicketProvider tp = new TicketProvider();
                             // iterate through all sections
-                            List<Section> sectionList = sections.parallelStream()
-                                    .map((sec) -> parseSectionFromJson((JSONObject) sec, tp))
-                                    .collect(Collectors.toList());
+                            List<Section> sectionList =
+                                    sections.toJavaList(JSONObject.class).parallelStream()
+                                            .map((sec) -> parseSectionFromJson(sec, tp))
+                                            .collect(Collectors.toList());
                             tp.setTicket(ticket);
                             Provider provider = providerDao.getOne(id);
                             if (provider == null)
@@ -120,9 +120,10 @@ public class TicketServiceImpl implements TicketService {
         JSONArray jsonItems = json.getJSONArray("items");
         Section section = new Section(time, description);
         // iterate through ticket items
-        List<TicketItem> ticketItems = jsonItems.parallelStream()
-                .map((item) -> parseTicketItemFromJson((JSONObject) item, section))
-                .collect(Collectors.toList());
+        List<TicketItem> ticketItems =
+                jsonItems.toJavaList(JSONObject.class).parallelStream()
+                        .map((item) -> parseTicketItemFromJson(item, section))
+                        .collect(Collectors.toList());
         section.setTicketItemList(ticketItems);
         section.setTicketProvider(tp);
         return section;
