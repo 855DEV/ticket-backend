@@ -20,5 +20,9 @@ public interface TicketRepository extends JpaRepository<Ticket, Integer> {
             ".city = ?2 and ticket.category=?3 and ticket.startDate >= ?4 and" +
             " ticket.endDate <= ?5")
     List<Ticket> findInDate(String name, String city, String category,
-                           Date start, Date end);
+                            Date start, Date end);
+
+    @Query(nativeQuery = true, value = "select * from ticket where " +
+            "category=?1 order by rand() limit ?2")
+    List<Ticket> randomGetByCategory(String category, int limit);
 }

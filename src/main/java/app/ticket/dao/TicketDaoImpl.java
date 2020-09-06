@@ -58,6 +58,11 @@ public class TicketDaoImpl implements TicketDao {
         }
     }
 
+    @Override
+    public List<Ticket> getRandomByCategory(String category, int limit) {
+        return ticketRepository.randomGetByCategory(category, limit);
+    }
+
     /**
      * Attach detailed data, like image and introduction to `ticket`
      * @param ticket target ticket

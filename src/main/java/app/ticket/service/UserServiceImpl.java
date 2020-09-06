@@ -1,8 +1,13 @@
 package app.ticket.service;
 
 import app.ticket.dao.UserDao;
+import app.ticket.entity.Ticket;
 import app.ticket.entity.User;
 import com.alibaba.fastjson.JSONObject;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,6 +26,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserByUsername(String username) {
         return userDao.findUserByUsername(username);
+    }
+
+    @Override
+    public Page<User> findByPage(int pageId, int size) {
+        Pageable page = PageRequest.of(pageId, size);
+        return userDao.findByPage(page);
     }
 
     @Override

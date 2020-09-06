@@ -52,6 +52,11 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
+    public List<Ticket> getRandomByCategory(String category, int limit) {
+        return ticketDao.getRandomByCategory(category, limit);
+    }
+
+    @Override
     @Cacheable
     public Ticket insertOne(JSONObject ticketJson) {
         Ticket ticket = new Ticket();
