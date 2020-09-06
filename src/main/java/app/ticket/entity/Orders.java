@@ -15,6 +15,7 @@ public class Orders {
     Date time;
     User user;
     BigDecimal price;
+    Integer state;
     List<OrderItem> orderItemList = new ArrayList<>();
 
     @Id
@@ -58,6 +59,16 @@ public class Orders {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    @Basic
+    @Column(name = "state")
+    public Integer getState() {
+        return state;
+    }
+
+    public void setState(Integer state) {
+        this.state = state;
     }
 
     @OneToMany(mappedBy = "order", cascade = {CascadeType.ALL})

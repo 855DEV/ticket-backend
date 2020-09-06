@@ -41,13 +41,18 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     @Override
+    public Orders getOne(Integer id) {
+        return ordersDao.getOne(id);
+    }
+
+    @Override
     public Orders addOne(User user, JSONObject orderJSON) {
 
         Orders order = new Orders();
         JSONArray itemsJson = orderJSON.getJSONArray("items");
         BigDecimal price = new BigDecimal(0);
         List<OrderItem> items = new ArrayList<>();
-        for (int i = 0; i < itemsJson.size(); i++){
+        for (int i = 0; i < itemsJson.size(); i++) {
             Integer id = itemsJson.getJSONObject(i).getInteger("ticketItemId");
             Integer amount = itemsJson.getJSONObject(i).getInteger("amount");
             TicketItem ticketItem = ticketItemDao.getOne(id);
@@ -78,4 +83,12 @@ public class OrdersServiceImpl implements OrdersService {
     public Orders addOne(Orders order) {
         return ordersDao.addOne(order);
     }
+
+    @Override
+    public Orders payOrder(Integer orderId) {
+        Orders order = ordersDao.getOne(orderId);
+        order.setState(1);
+        return order;
+    }
+
 }

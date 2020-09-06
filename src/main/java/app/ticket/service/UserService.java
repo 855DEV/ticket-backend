@@ -22,4 +22,6 @@ public interface UserService {
      * Returns the authenticated User in current context
      */
     User getAuthedUser();
+
+    boolean canDo(Integer targetId);
 }

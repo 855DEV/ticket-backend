@@ -9,9 +9,17 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class OrdersDaoImpl implements OrdersDao{
-    @Autowired
+public class OrdersDaoImpl implements OrdersDao {
     private OrdersRepository ordersRepository;
+
+    public OrdersDaoImpl(OrdersRepository ordersRepository) {
+        this.ordersRepository = ordersRepository;
+    }
+
+    @Override
+    public Orders getOne(Integer orderId) {
+        return ordersRepository.findById(orderId).orElse(null);
+    }
 
     @Override
     public List<Orders> getAllOrdersByUserId(User user) {
@@ -24,5 +32,7 @@ public class OrdersDaoImpl implements OrdersDao{
     }
 
     @Override
-    public List<Orders> findAll() {return ordersRepository.findAll();}
+    public List<Orders> findAll() {
+        return ordersRepository.findAll();
+    }
 }

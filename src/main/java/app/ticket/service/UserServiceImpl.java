@@ -109,4 +109,17 @@ public class UserServiceImpl implements UserService {
                 (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return getUserByUsername(username);
     }
+
+    /**
+     * check if current user can perform a privileged operation
+     *
+     * @param targetId the user id of operation target
+     * @return whether the user has privilege
+     */
+    public boolean canDo(Integer targetId) {
+        User user = getAuthedUser();
+        if (user == null)
+            return false;
+        return user.getType().equals(User.ADMIN_TYPE_ID) || user.getId().equals(targetId);
+    }
 }

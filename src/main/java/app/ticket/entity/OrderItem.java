@@ -55,6 +55,14 @@ public class OrderItem {
     public void setAmount(Integer amount) {
         this.amount = amount;
     }
+
+    @Override
+    public String toString() {
+        return "OrderItem{" +
+                "ticketItem=" + ticketItem +
+                ", amount=" + amount +
+                '}';
+    }
 }
 
 class OrderItemId implements Serializable {
