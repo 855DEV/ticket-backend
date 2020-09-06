@@ -3,6 +3,8 @@ package app.ticket.dao;
 import app.ticket.entity.*;
 import app.ticket.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -19,6 +21,11 @@ public class UserDaoImpl implements UserDao {
     @Override
     public User findUserByUsername(String username) {
         return userRepository.findByUsername(username);
+    }
+
+    @Override
+    public Page<User> findByPage(Pageable page) {
+        return userRepository.findAll(page);
     }
 
     @Override

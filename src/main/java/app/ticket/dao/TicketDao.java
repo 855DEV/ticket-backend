@@ -12,6 +12,8 @@ public interface TicketDao {
 
     Page<Ticket> findByPage(Pageable page);
 
+    List<Ticket> getRandomByCategory(String category, int limit);
+
     Ticket findOne(Integer id);
 
     Ticket insertOne(Ticket ticket);

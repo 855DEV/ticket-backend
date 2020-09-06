@@ -13,6 +13,8 @@ public interface TicketService {
 
     Ticket findOne(Integer id);
 
+    List<Ticket> getRandomByCategory(String category, int limit);
+
     Ticket insertOne(JSONObject ticket);
 
     Ticket insertOne(Ticket ticket);

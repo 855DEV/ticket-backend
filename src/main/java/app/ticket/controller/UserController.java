@@ -1,12 +1,19 @@
 package app.ticket.controller;
 
+import app.ticket.entity.Ticket;
 import app.ticket.entity.User;
 import app.ticket.service.UserService;
 import app.ticket.util.Message;
 import com.alibaba.fastjson.JSONObject;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static app.ticket.util.TicketAdapter.wrapTicket;
 
 @RestController
 @RequestMapping("/user")
@@ -26,6 +33,29 @@ public class UserController {
         user.setPassword(""); // remove encrypted password from response
         System.out.println(user);
         return ResponseEntity.status(HttpStatus.OK).body(user);
+    }
+
+    @GetMapping("/all")
+    public JSONObject findAll(@RequestParam(name = "page", required = false) Integer page,
+                              @RequestParam(name = "size", required = false) Integer size) {
+        System.out.println("GET /user?page=" + page + "&size=" + size);
+        page = (page == null) ? 0 : page;
+        size = (size == null) ? 10 : size;
+        Page<User> userPage = userService.findByPage(page, size);
+        List<User> userList = userPage.getContent();
+        int total = userPage.getTotalPages();
+        boolean next = userPage.hasNext();
+        boolean last = userPage.isLast();
+        List<JSONObject> content = new ArrayList<>();
+        for (User user : userList) {
+            content.add(wrapUser(user));
+        }
+        JSONObject data = new JSONObject();
+        data.put("data", content);
+        data.put("next", next);
+        data.put("last", last);
+        data.put("total", total);
+        return data;
     }
 
     @PostMapping("/register")

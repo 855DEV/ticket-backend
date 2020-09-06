@@ -57,6 +57,17 @@ public class TicketController {
         return wrapTicket(ticket);
     }
 
+    @GetMapping("/random")
+    public List<JSONObject> getRandomByCategory(@RequestParam("category") String category,
+            @RequestParam("limit") int limit) {
+        List<Ticket> tickets = ticketService.getRandomByCategory(category, limit);
+        List<JSONObject> resData = new ArrayList<>();
+        for (Ticket t : tickets) {
+            resData.add(wrapTicket(t));
+        }
+        return resData;
+    }
+
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> insertOne(@RequestBody JSONObject ticketJson) {
         User user = userService.getAuthedUser();
