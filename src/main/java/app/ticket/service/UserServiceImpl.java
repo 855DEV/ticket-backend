@@ -1,10 +1,8 @@
 package app.ticket.service;
 
 import app.ticket.dao.UserDao;
-import app.ticket.entity.Ticket;
 import app.ticket.entity.User;
 import com.alibaba.fastjson.JSONObject;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -84,6 +82,9 @@ public class UserServiceImpl implements UserService {
                     break;
                 case "password":
                     user.setPassword(bCryptPasswordEncoder.encode(val));
+                    break;
+                case "address":
+                    user.setAddress(val);
                     break;
                 default:
                     break;
