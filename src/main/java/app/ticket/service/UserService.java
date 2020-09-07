@@ -1,6 +1,5 @@
 package app.ticket.service;
 
-import app.ticket.entity.Ticket;
 import app.ticket.entity.User;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.data.domain.Page;
