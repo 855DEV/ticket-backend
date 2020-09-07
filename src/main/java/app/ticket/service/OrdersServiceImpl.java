@@ -4,7 +4,6 @@ import app.ticket.dao.OrdersDao;
 import app.ticket.dao.TicketItemDao;
 import app.ticket.entity.OrderItem;
 import app.ticket.entity.Orders;
-import app.ticket.entity.Ticket;
 import app.ticket.entity.TicketItem;
 import app.ticket.entity.User;
 import com.alibaba.fastjson.JSONArray;
@@ -13,12 +12,10 @@ import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @CacheConfig(cacheNames = {"lastResult"})
@@ -87,7 +84,7 @@ public class OrdersServiceImpl implements OrdersService {
     @Override
     public Orders payOrder(Integer orderId) {
         Orders order = ordersDao.getOne(orderId);
-        order.setState(1);
+        ordersDao.payOne(order);
         return order;
     }
 

@@ -5,14 +5,9 @@ import app.ticket.entity.Orders;
 import app.ticket.entity.User;
 import app.ticket.service.OrdersService;
 import app.ticket.service.UserService;
+import app.ticket.util.Message;
 import com.alibaba.fastjson.JSONObject;
-import org.hibernate.criterion.Order;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 @RestController
 @RequestMapping("/order")
@@ -33,9 +28,9 @@ public class OrdersController {
     }
 
     @GetMapping("/{id}")
-    public Orders getOrder(@PathVariable(name = "id") Integer id){
+    public Orders getOrder(@PathVariable(name = "id") Integer id) {
         Orders order = ordersService.getOne(id);
-        if(!userService.canDo(order.getUser().getId())) {
+        if (!userService.canDo(order.getUser().getId())) {
             return null;
         }
         System.out.println("Order:");
@@ -44,6 +39,17 @@ public class OrdersController {
             System.out.println(i);
         }
         return order;
+    }
+
+    @GetMapping("/pay")
+    public Message payOrder(@RequestParam("id") Integer id) {
+        Orders order = ordersService.getOne(id);
+        if (order == null)
+            return new Message(1, "Order not exist.");
+        if (!userService.canDo(order.getUser().getId()))
+            return new Message(2, "Access denied.");
+        ordersService.payOrder(id);
+        return new Message(0, "success");
     }
 
     @PostMapping

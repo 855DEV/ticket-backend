@@ -13,4 +13,6 @@ public interface OrdersDao {
     List<Orders> getAllOrdersByUserId(User user);
 
     List<Orders> findAll();
+
+    Orders payOne(Orders order);
 }

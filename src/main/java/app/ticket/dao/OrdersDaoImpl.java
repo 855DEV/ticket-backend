@@ -3,7 +3,6 @@ package app.ticket.dao;
 import app.ticket.entity.Orders;
 import app.ticket.entity.User;
 import app.ticket.repository.OrdersRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -34,5 +33,12 @@ public class OrdersDaoImpl implements OrdersDao {
     @Override
     public List<Orders> findAll() {
         return ordersRepository.findAll();
+    }
+
+    @Override
+    public Orders payOne(Orders order) {
+        order.setState(1);
+        ordersRepository.save(order);
+        return order;
     }
 }
