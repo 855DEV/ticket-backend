@@ -4,7 +4,6 @@ import app.ticket.dao.OrdersDao;
 import app.ticket.dao.TicketItemDao;
 import app.ticket.entity.OrderItem;
 import app.ticket.entity.Orders;
-import app.ticket.entity.Ticket;
 import app.ticket.entity.TicketItem;
 import app.ticket.entity.User;
 import com.alibaba.fastjson.JSONArray;
@@ -13,12 +12,10 @@ import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @CacheConfig(cacheNames = {"lastResult"})
@@ -41,13 +38,18 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     @Override
+    public Orders getOne(Integer id) {
+        return ordersDao.getOne(id);
+    }
+
+    @Override
     public Orders addOne(User user, JSONObject orderJSON) {
 
         Orders order = new Orders();
         JSONArray itemsJson = orderJSON.getJSONArray("items");
         BigDecimal price = new BigDecimal(0);
         List<OrderItem> items = new ArrayList<>();
-        for (int i = 0; i < itemsJson.size(); i++){
+        for (int i = 0; i < itemsJson.size(); i++) {
             Integer id = itemsJson.getJSONObject(i).getInteger("ticketItemId");
             Integer amount = itemsJson.getJSONObject(i).getInteger("amount");
             TicketItem ticketItem = ticketItemDao.getOne(id);
@@ -78,4 +80,12 @@ public class OrdersServiceImpl implements OrdersService {
     public Orders addOne(Orders order) {
         return ordersDao.addOne(order);
     }
+
+    @Override
+    public Orders payOrder(Integer orderId) {
+        Orders order = ordersDao.getOne(orderId);
+        ordersDao.payOne(order);
+        return order;
+    }
+
 }
