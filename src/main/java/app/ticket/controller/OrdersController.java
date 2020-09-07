@@ -2,12 +2,19 @@ package app.ticket.controller;
 
 import app.ticket.entity.OrderItem;
 import app.ticket.entity.Orders;
+import app.ticket.entity.Ticket;
 import app.ticket.entity.User;
 import app.ticket.service.OrdersService;
 import app.ticket.service.UserService;
 import app.ticket.util.Message;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static app.ticket.util.TicketAdapter.wrapTicket;
+import static app.ticket.util.TicketAdapter.wrapTicketItem;
 
 @RestController
 @RequestMapping("/order")
@@ -27,8 +34,29 @@ public class OrdersController {
         return ordersService.getUserOrders(user.getId());
     }
 
+    public static JSONObject wrapOrder(Orders order) {
+        JSONObject json = new JSONObject();
+        json.put("id", order.getId());
+        json.put("time", order.getTime());
+        json.put("price", order.getPrice());
+        json.put("state", order.getState());
+        // attach ticket info for every ticketItem
+        List<JSONObject> orderList = new ArrayList<>();
+        for (OrderItem item : order.getOrderItemList()) {
+            Ticket ticket =
+                    item.getTicketItem().getSection().getTicketProvider().getTicket();
+            JSONObject i = new JSONObject();
+            i.put("ticket", wrapTicket(ticket));
+            i.put("amount", item.getAmount());
+            i.put("ticketItem", wrapTicketItem(item.getTicketItem()));
+            orderList.add(i);
+        }
+        json.put("orderItemList", orderList);
+        return json;
+    }
+
     @GetMapping("/{id}")
-    public Orders getOrder(@PathVariable(name = "id") Integer id) {
+    public JSONObject getOrder(@PathVariable(name = "id") Integer id) {
         Orders order = ordersService.getOne(id);
         if (!userService.canDo(order.getUser().getId())) {
             return null;
@@ -38,7 +66,7 @@ public class OrdersController {
         for (OrderItem i : order.getOrderItemList()) {
             System.out.println(i);
         }
-        return order;
+        return wrapOrder(order);
     }
 
     @GetMapping("/pay")
@@ -48,6 +76,8 @@ public class OrdersController {
             return new Message(1, "Order not exist.");
         if (!userService.canDo(order.getUser().getId()))
             return new Message(2, "Access denied.");
+        if (order.getState() == 1)
+            return new Message(3, "This order has been paid.");
         ordersService.payOrder(id);
         return new Message(0, "success");
     }
@@ -56,8 +86,9 @@ public class OrdersController {
     public JSONObject createOrder(@RequestBody JSONObject info) {
         User user = userService.getAuthedUser();
         System.out.println("POST /orders" + user + " " + info);
-
+        if (user == null)
+            return new Message(1, "User not exist.");
         ordersService.addOne(user, info);
-        return null;
+        return new Message(0, "Success");
     }
 }

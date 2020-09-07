@@ -7,7 +7,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,6 +61,7 @@ public class TicketAdapter {
         JSONObject j = new JSONObject();
         j.put("price", ticketItem.getPrice());
         j.put("description", ticketItem.getDescription());
+        j.put("itemId", ticketItem.getId());
         return j;
     }
 }

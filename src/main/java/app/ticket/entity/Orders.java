@@ -15,7 +15,7 @@ public class Orders {
     Date time;
     User user;
     BigDecimal price;
-    Integer state;
+    Integer state = 0;
     List<OrderItem> orderItemList = new ArrayList<>();
 
     @Id

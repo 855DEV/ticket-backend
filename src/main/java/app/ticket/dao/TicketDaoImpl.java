@@ -39,7 +39,7 @@ public class TicketDaoImpl implements TicketDao {
     public Ticket findOne(Integer id) {
         Ticket ticket = ticketRepository.getOne(id);
         TicketDetail detail = ticketDetailRepository.findByTid(id);
-        if(detail != null){
+        if (detail != null) {
             ticket.setImage(detail.getImg());
             ticket.setIntro(detail.getIntro());
         } else {
@@ -60,18 +60,21 @@ public class TicketDaoImpl implements TicketDao {
 
     @Override
     public List<Ticket> getRandomByCategory(String category, int limit) {
-        return ticketRepository.randomGetByCategory(category, limit);
+        List<Ticket> list = ticketRepository.randomGetByCategory(category, limit);
+        list.forEach(this::attachDetail);
+        return list;
     }
 
     /**
      * Attach detailed data, like image and introduction to `ticket`
+     *
      * @param ticket target ticket
      */
     private void attachDetail(Ticket ticket) {
-        if(ticket == null) return;
+        if (ticket == null) return;
         TicketDetail detail =
                 ticketDetailRepository.findByTid(ticket.getId());
-        if(detail != null){
+        if (detail != null) {
             ticket.setImage(detail.getImg());
             ticket.setIntro(detail.getIntro());
         }
