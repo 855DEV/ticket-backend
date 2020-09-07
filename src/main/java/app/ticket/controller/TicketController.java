@@ -65,6 +65,9 @@ public class TicketController {
         for (Ticket t : tickets) {
             resData.add(wrapTicket(t));
         }
+        for (JSONObject j : resData) {
+            System.out.println(j);
+        }
         return resData;
     }
 
