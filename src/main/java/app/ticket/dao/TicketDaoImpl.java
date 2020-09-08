@@ -4,8 +4,11 @@ import app.ticket.entity.Ticket;
 import app.ticket.entity.TicketDetail;
 import app.ticket.repository.TicketDetailRepository;
 import app.ticket.repository.TicketRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -19,20 +22,38 @@ public class TicketDaoImpl implements TicketDao {
         this.ticketDetailRepository = ticketDetailRepository;
     }
 
-    // TODO: attach image and intro to results
-    // TODO: Pageable query
     @Override
     public List<Ticket> findAll() {
-        return ticketRepository.findAll();
+        List<Ticket> tickets = ticketRepository.findAll();
+        tickets.forEach(this::attachDetail);
+        return tickets;
+    }
+
+    @Override
+    public Page<Ticket> findByPage(Pageable page) {
+        Page<Ticket> ticketPage = ticketRepository.findAll(page);
+        ticketPage.getContent().parallelStream().forEach(this::attachDetail);
+        return ticketPage;
+    }
+
+    @Override
+    public List<Ticket> getTicketInDate(String city, String category,
+                                               Date start, Date end){
+        List<Ticket> ticketList = ticketRepository.findInDate(city, category, start, end);
+        for (Ticket t : ticketList)
+            attachDetail(t);
+        return ticketList;
     }
 
     @Override
     public Ticket findOne(Integer id) {
         Ticket ticket = ticketRepository.getOne(id);
         TicketDetail detail = ticketDetailRepository.findByTid(id);
-        if(detail != null){
+        if (detail != null) {
             ticket.setImage(detail.getImg());
             ticket.setIntro(detail.getIntro());
+        } else {
+            System.err.println("Ticket " + id + " detail is null");
         }
         return ticket;
     }
@@ -44,6 +65,28 @@ public class TicketDaoImpl implements TicketDao {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    @Override
+    public List<Ticket> getRandomByCategory(String category, int limit) {
+        List<Ticket> list = ticketRepository.randomGetByCategory(category, limit);
+        list.forEach(this::attachDetail);
+        return list;
+    }
+
+    /**
+     * Attach detailed data, like image and introduction to `ticket`
+     *
+     * @param ticket target ticket
+     */
+    private void attachDetail(Ticket ticket) {
+        if (ticket == null) return;
+        TicketDetail detail =
+                ticketDetailRepository.findByTid(ticket.getId());
+        if (detail != null) {
+            ticket.setImage(detail.getImg());
+            ticket.setIntro(detail.getIntro());
         }
     }
 

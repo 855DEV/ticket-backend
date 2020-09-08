@@ -7,6 +7,7 @@ import java.util.List;
 @Entity
 @Table(name = "user")
 public class User {
+    public static final Integer ADMIN_TYPE_ID = 0;
     private Integer id;
     private Integer type = 1;
     private String nickname;

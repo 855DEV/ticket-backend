@@ -1,6 +1,8 @@
 package app.ticket.controller;
 
+import app.ticket.entity.Ticket;
 import app.ticket.repository.ProviderRepository;
+import app.ticket.repository.TicketRepository;
 import app.ticket.repository.UserRepository;
 import app.ticket.setup.TestContext;
 import com.alibaba.fastjson.JSONObject;
@@ -10,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -19,16 +22,21 @@ import org.springframework.web.context.WebApplicationContext;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.*;
 
 @SpringBootTest
 @Transactional
+@DirtiesContext
 @AutoConfigureMockMvc
 public class TicketControllerTest {
     @Autowired
     TicketController ticketController;
+
+    @Autowired
+    private TicketRepository ticketRepository;
 
     @Autowired
     UserRepository userRepository;
@@ -48,11 +56,57 @@ public class TicketControllerTest {
                 .webAppContextSetup(context)
                 .apply(springSecurity())
                 .build();
-        TestContext.setUpProvider(providerRepository, 20);
+        TestContext.setUpProvider(providerRepository, 10);
         TestContext.createGodAdmin(userRepository);
         authToken = TestContext.getGodAdminAuth(mockMvc);
         assertNotNull(authToken);
         assertNotEquals("", authToken);
+    }
+
+    @Test
+    @DirtiesContext
+    public void findAll() throws Exception {
+        // pre-test
+        String preStr = mockMvc.perform(get("/ticket?page=0&size=10"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        JSONObject j1 = JSONObject.parseObject(preStr);
+        assertEquals(0, j1.getInteger("total"));
+        assertTrue(j1.getBooleanValue("last"));
+        // insert sample data
+        int size = 42;
+        for (int i = 0; i < size; i++) {
+            Ticket ticket = TestContext.createTicket(providerRepository);
+            System.out.println("Ticket: id " + ticket.getId());
+            ticketRepository.save(ticket);
+        }
+        // Test normal page
+        String nStr = mockMvc.perform(get("/ticket?page=0&size=10"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        JSONObject nJson = JSONObject.parseObject(nStr);
+        assertEquals(5, nJson.getInteger("total"));
+        assertTrue(nJson.getBooleanValue("next"));
+        // Test end of page
+        String str = mockMvc.perform(get("/ticket?page=100&size=10"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        JSONObject json = JSONObject.parseObject(str);
+        assertTrue(json.getBooleanValue("last"));
+        assertFalse(json.getBooleanValue("next"));
+    }
+
+    @Test
+    @DirtiesContext
+    public void findOne() throws Exception {
+        Ticket ticket = TestContext.createTicket(providerRepository);
+        ticket = ticketRepository.save(ticket);
+        assertNotNull(ticket);
+        assertNotNull(ticket.getId());
+        String res =
+                mockMvc.perform(get("/ticket/" + ticket.getId())).andReturn().getResponse().getContentAsString();
+        JSONObject json = JSONObject.parseObject(res);
+        assertEquals(ticket.getName(), json.getString("name"));
     }
 
     @Test
@@ -150,5 +204,15 @@ public class TicketControllerTest {
         JSONObject res = JSONObject.parseObject(result);
         System.out.println(res);
         assertEquals("上海魔法世界", res.getString("name"));
+
+        // bad date format
+        String exampleBad = "{\n" +
+                "    \"startDate\": \"12\"\n" +
+                "}";
+        RequestBuilder badReq = post("/ticket")
+                .header("Authorization", authToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(exampleBad);
+        mockMvc.perform(badReq).andExpect(status().is4xxClientError());
     }
 }
