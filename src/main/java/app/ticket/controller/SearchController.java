@@ -1,6 +1,7 @@
 package app.ticket.controller;
 
 import app.ticket.entity.Ticket;
+import app.ticket.repository.TicketRepository;
 import app.ticket.service.TicketService;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -27,8 +28,10 @@ import static app.ticket.util.TicketAdapter.wrapTicket;
 public class SearchController {
     private final TicketService ticketService;
 
-    public SearchController(TicketService ticketService) {
-        this.ticketService = ticketService;
+    private final TicketRepository ticketRepository;
+
+    public SearchController(TicketService ticketService, TicketRepository ticketRepository) {
+        this.ticketService = ticketService; this.ticketRepository =ticketRepository;
     }
 
     private class myClass {
@@ -70,8 +73,6 @@ public class SearchController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new JSONArray());
         }
 
-        List<Ticket> ticketList = ticketService.findAll();
-        System.out.println("total ticket number: " + ticketList.size());
         String sText[] = text.split(" ");
         SimpleDateFormat ft = new SimpleDateFormat("yyyyMMdd");
         Date st = new Date(), en = new Date();
@@ -91,6 +92,26 @@ public class SearchController {
         calendar.add(Calendar.MINUTE, 59);
         calendar.add(Calendar.SECOND, 59);
         en = calendar.getTime();
+        if (startDate.isBlank()){
+            try {
+                st = ft.parse("19700101");
+            } catch (ParseException e) {
+                e.printStackTrace();
+                System.err.println("ERROR: Failed to parse date string");
+            }
+        }
+        if (endDate.isBlank()){
+            try {
+                en = ft.parse("20250101");
+            } catch (ParseException e) {
+                e.printStackTrace();
+                System.err.println("ERROR: Failed to parse date string");
+            }
+        }
+
+        System.out.println("Enter findInDate:  " + city + "; " + category + "; " + st + "; " + en);
+        List<Ticket> ticketList = ticketRepository.findInDate(city, category, st, en);
+        System.out.println("OK!!!!!");
 
         List<myClass> res = new ArrayList<>();
         for (Ticket t : ticketList) {
@@ -109,7 +130,7 @@ public class SearchController {
             }
 
             Integer cnt = 0;
-            //System.out.println("Parse " + t + ": ");
+            if (text.isBlank()) cnt = 1;
             for (String s : sText) {
                 if (s.isBlank()) continue;
                 if (t.getName() != null && t.getName().contains(s)) {
@@ -134,7 +155,7 @@ public class SearchController {
                 }
                 //System.out.println("case 5");
             }
-            //System.out.println("res = " + cnt);
+            System.out.println("res = " + cnt);
             if (cnt == 0) continue;
             res.add(new myClass(t, cnt));
         }
