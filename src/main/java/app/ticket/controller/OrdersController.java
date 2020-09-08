@@ -5,6 +5,7 @@ import app.ticket.entity.Orders;
 import app.ticket.entity.Ticket;
 import app.ticket.entity.User;
 import app.ticket.service.OrdersService;
+import app.ticket.service.TicketService;
 import app.ticket.service.UserService;
 import app.ticket.util.Message;
 import com.alibaba.fastjson.JSONObject;
@@ -21,20 +22,27 @@ import static app.ticket.util.TicketAdapter.wrapTicketItem;
 public class OrdersController {
     private final OrdersService ordersService;
     private final UserService userService;
+    private final TicketService ticketService;
 
-    public OrdersController(OrdersService ordersService, UserService userService) {
+    public OrdersController(OrdersService ordersService,
+                            UserService userService, TicketService ticketService) {
         this.ordersService = ordersService;
         this.userService = userService;
+        this.ticketService = ticketService;
     }
 
     @GetMapping
-    public Object getOrdersByUser() {
+    public List<JSONObject> getOrdersByUser() {
         User user = userService.getAuthedUser();
         System.out.println(user);
-        return ordersService.getUserOrders(user.getId());
+        List<Orders> orders = ordersService.getUserOrders(user.getId());
+        List<JSONObject> data = new ArrayList<>();
+        for (Orders o : orders)
+            data.add(wrapOrder(o));
+        return data;
     }
 
-    public static JSONObject wrapOrder(Orders order) {
+    public JSONObject wrapOrder(Orders order) {
         JSONObject json = new JSONObject();
         json.put("id", order.getId());
         json.put("time", order.getTime());
@@ -45,8 +53,9 @@ public class OrdersController {
         for (OrderItem item : order.getOrderItemList()) {
             Ticket ticket =
                     item.getTicketItem().getSection().getTicketProvider().getTicket();
+            Ticket t = ticketService.findOne(ticket.getId());
             JSONObject i = new JSONObject();
-            i.put("ticket", wrapTicket(ticket));
+            i.put("ticket", wrapTicket(t));
             i.put("amount", item.getAmount());
             i.put("ticketItem", wrapTicketItem(item.getTicketItem()));
             orderList.add(i);
