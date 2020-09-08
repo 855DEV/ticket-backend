@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -33,6 +34,15 @@ public class TicketDaoImpl implements TicketDao {
         Page<Ticket> ticketPage = ticketRepository.findAll(page);
         ticketPage.getContent().parallelStream().forEach(this::attachDetail);
         return ticketPage;
+    }
+
+    @Override
+    public List<Ticket> getTicketInDate(String city, String category,
+                                               Date start, Date end){
+        List<Ticket> ticketList = ticketRepository.findInDate(city, category, start, end);
+        for (Ticket t : ticketList)
+            attachDetail(t);
+        return ticketList;
     }
 
     @Override
