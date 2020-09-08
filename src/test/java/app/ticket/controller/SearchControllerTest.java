@@ -55,8 +55,8 @@ public class SearchControllerTest {
         TestContext.setUpProvider(providerRepository, 20);
         Ticket t1 = TestContext.createTicket(providerRepository, "魔法世界","上海交通大学","上海", "20200718", "20200729","mo", true);
         Ticket t2 = TestContext.createTicket(providerRepository, "膜法世界","上交","下海", "20200703", "20200729", "mo", true);
-        Ticket t3 = TestContext.createTicket(providerRepository, "模法世界","交通大学","左海", "20200714", "20200729", "ha", true);
-        Ticket t4 = TestContext.createTicket(providerRepository, "莫法世界","蛤交大","上海", "20200716", "20200729", "ha", true);
+        Ticket t3 = TestContext.createTicket(providerRepository, "模法世界","交通大学","左海", "20200714", "20200729", "mo", true);
+        Ticket t4 = TestContext.createTicket(providerRepository, "莫法世界","蛤交大","上海", "20200716", "20200729", "mo", true);
         ticketRepository.save(t1); ticketRepository.save(t2); ticketRepository.save(t3); ticketRepository.save(t4);
     }
 
@@ -65,19 +65,25 @@ public class SearchControllerTest {
 
         // test1
         System.out.println("Test 1: search text=海, orderChosen = 1");
-        String result = mockMvc.perform(get("/search?s=海&o=1")).andExpect(status().isOk())
+        String result = mockMvc.perform(get("/search?s=海&city=上海&cat=mo&o=1")).andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
         System.out.println(result);
 
         // test2
         System.out.println("Test 2: search text=海, orderChosen = 3");
-        result = mockMvc.perform(get("/search?s=海&o=3")).andExpect(status().isOk())
+        result = mockMvc.perform(get("/search?s=海&city=上海&cat=mo&o=1")).andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
         System.out.println(result);
 
         // test3
         System.out.println("Test 3: search text=世界, city = 上海");
-        result = mockMvc.perform(get("/search?s=世界&city=上海")).andExpect(status().isOk())
+        result = mockMvc.perform(get("/search?s=世界&city=上海&cat=mo")).andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+        System.out.println(result);
+
+        // test4
+        System.out.println("Test 4: search text=啊, city = 上海");
+        result = mockMvc.perform(get("/search?s=啊&city=上海&cat=mo")).andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
         System.out.println(result);
     }
