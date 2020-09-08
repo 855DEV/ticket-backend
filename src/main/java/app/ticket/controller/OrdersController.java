@@ -95,9 +95,17 @@ public class OrdersController {
     public JSONObject createOrder(@RequestBody JSONObject info) {
         User user = userService.getAuthedUser();
         System.out.println("POST /orders" + user + " " + info);
-        if (user == null)
-            return new Message(1, "User not exist.");
-        ordersService.addOne(user, info);
-        return new Message(0, "Success");
+        JSONObject j = new JSONObject();
+        if (user == null){
+            j.put("code", 1);
+            j.put("message", "User not exist.");
+            j.put("id", -1);
+            return j;
+        }
+        Orders o = ordersService.addOne(user, info);
+        j.put("code", 0);
+        j.put("message", "Success");
+        j.put("id", o.getId());
+        return j;
     }
 }
