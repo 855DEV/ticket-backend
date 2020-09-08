@@ -9,6 +9,7 @@ import app.ticket.entity.User;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +31,7 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     @Override
-    @Cacheable
+    @Cacheable(cacheNames = "getUserOrders")
     public List<Orders> getUserOrders(Integer userId) {
         User user = new User();
         user.setId(userId);
@@ -43,6 +44,7 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     @Override
+    @CacheEvict(cacheNames = "getUserOrders", allEntries = true)
     public Orders addOne(User user, JSONObject orderJSON) {
 
         Orders order = new Orders();
@@ -77,11 +79,13 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     @Override
+    @CacheEvict(cacheNames = "getUserOrders", allEntries = true)
     public Orders addOne(Orders order) {
         return ordersDao.addOne(order);
     }
 
     @Override
+    @CacheEvict(cacheNames = "getUserOrders", allEntries = true)
     public Orders payOrder(Integer orderId) {
         Orders order = ordersDao.getOne(orderId);
         ordersDao.payOne(order);

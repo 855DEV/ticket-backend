@@ -57,7 +57,7 @@ public class SearchController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @Cacheable
+    @Cacheable(cacheNames = "getSearch")
     public ResponseEntity<JSONArray> getSearch(@RequestParam(value = "s") String text,
                                                @RequestParam(value = "city", defaultValue = "") String city,
                                                @RequestParam(value = "cat", defaultValue = "") String category,

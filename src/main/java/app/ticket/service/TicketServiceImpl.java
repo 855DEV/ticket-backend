@@ -6,7 +6,9 @@ import app.ticket.entity.*;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,31 +35,36 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    @Cacheable
+    @Cacheable(cacheNames = "findAll")
     public List<Ticket> findAll() {
         return ticketDao.findAll();
     }
 
     @Override
-    @Cacheable
     public Ticket findOne(Integer id) {
         return ticketDao.findOne(id);
     }
 
     @Override
-    @Cacheable
+    @Cacheable(cacheNames = "findByPage")
     public Page<Ticket> findByPage(int pageId, int size) {
         Pageable page = PageRequest.of(pageId, size);
         return ticketDao.findByPage(page);
     }
 
     @Override
+    @Cacheable(cacheNames = "getRandomByCategory")
     public List<Ticket> getRandomByCategory(String category, int limit) {
         return ticketDao.getRandomByCategory(category, limit);
     }
 
     @Override
-    @Cacheable
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "getSearch", allEntries = true),
+            @CacheEvict(cacheNames = "findAll", allEntries = true),
+            @CacheEvict(cacheNames = "findByPage", allEntries = true),
+            @CacheEvict(cacheNames = "getRandomByCategory", allEntries = true)
+    })
     public Ticket insertOne(JSONObject ticketJson) {
         Ticket ticket = new Ticket();
         String name = ticketJson.getString("name");
@@ -108,6 +115,12 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "getSearch", allEntries = true),
+            @CacheEvict(cacheNames = "findAll", allEntries = true),
+            @CacheEvict(cacheNames = "findByPage", allEntries = true),
+            @CacheEvict(cacheNames = "getRandomByCategory", allEntries = true)
+    })
     public Ticket insertOne(Ticket ticket) {
         return ticketDao.insertOne(ticket);
     }
