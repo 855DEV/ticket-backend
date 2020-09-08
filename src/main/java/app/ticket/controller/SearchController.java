@@ -1,5 +1,6 @@
 package app.ticket.controller;
 
+import app.ticket.dao.TicketDao;
 import app.ticket.entity.Ticket;
 import app.ticket.repository.TicketRepository;
 import app.ticket.service.TicketService;
@@ -28,10 +29,10 @@ import static app.ticket.util.TicketAdapter.wrapTicket;
 public class SearchController {
     private final TicketService ticketService;
 
-    private final TicketRepository ticketRepository;
+    private final TicketDao ticketDao;
 
-    public SearchController(TicketService ticketService, TicketRepository ticketRepository) {
-        this.ticketService = ticketService; this.ticketRepository =ticketRepository;
+    public SearchController(TicketService ticketService, TicketDao ticketDao) {
+        this.ticketService = ticketService; this.ticketDao = ticketDao;
     }
 
     private class myClass {
@@ -109,26 +110,12 @@ public class SearchController {
             }
         }
 
-        System.out.println("Enter findInDate:  " + city + "; " + category + "; " + st + "; " + en);
-        List<Ticket> ticketList = ticketRepository.findInDate(city, category, st, en);
+        System.out.println("Enter ticketDao:  " + city + "; " + category + "; " + st + "; " + en);
+        List<Ticket> ticketList = ticketDao.getTicketInDate(city, category, st, en);
         System.out.println("OK!!!!!");
 
         List<myClass> res = new ArrayList<>();
         for (Ticket t : ticketList) {
-            if (!city.isBlank() && (StringUtils.isEmpty(t.getCity()) || !t.getCity().equals(city)))
-                continue;
-            if (!category.isBlank() && (StringUtils.isEmpty(t.getCategory()) || !t.getCategory().equals(category)))
-                continue;
-            if (!startDate.isBlank() && !endDate.isBlank()) {
-                Date tst = t.getStartDate(), ten = t.getEndDate();
-                if (tst == null || ten == null) continue;
-                if (!((tst.compareTo(st) >= 0 && tst.compareTo(en) <= 0) ||
-                        (ten.compareTo(st) >= 0 && ten.compareTo(en) <= 0) ||
-                        (st.compareTo(tst) >= 0 && st.compareTo(ten) <= 0) ||
-                        (en.compareTo(tst) >= 0 && en.compareTo(ten) <= 0)))
-                    continue;
-            }
-
             Integer cnt = 0;
             if (text.isBlank()) cnt = 1;
             for (String s : sText) {
