@@ -16,10 +16,10 @@ public interface TicketRepository extends JpaRepository<Ticket, Integer> {
     List<Ticket> findByNameAndCityAndCategory(String name, String city,
                                               String category);
 
-    @Query("select ticket from Ticket ticket where ticket.name=?1 and ticket" +
-            ".city = ?2 and ticket.category=?3 and ticket.startDate >= ?4 and" +
-            " ticket.endDate <= ?5")
-    List<Ticket> findInDate(String name, String city, String category,
+    @Query("select ticket from Ticket ticket where ticket" +
+            ".city = ?1 and ticket.category=?2 and ticket.startDate >= ?3 and" +
+            " ticket.endDate <= ?4")
+    List<Ticket> findInDate(String city, String category,
                             Date start, Date end);
 
     @Query(nativeQuery = true, value = "select * from ticket where " +
